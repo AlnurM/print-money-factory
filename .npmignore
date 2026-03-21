@@ -1,0 +1,7 @@
+.planning/
+.git/
+.claude/
+*.test.*
+node_modules/
+CLAUDE.md
+PROJECT.md
