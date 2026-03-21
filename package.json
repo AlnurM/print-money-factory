@@ -1,6 +1,6 @@
 {
   "name": "@print-money-factory/cli",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Trading strategy development pipeline for Claude Code",
   "bin": {
     "pmf": "./bin/install.mjs",
