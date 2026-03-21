@@ -36,7 +36,7 @@ Plans:
 - [x] 01-01-PLAN.md -- npm package scaffolding + install script (commands, package.json, bin/install.mjs, requirements.txt)
 - [x] 01-02-PLAN.md -- Fixed metrics module with known-answer TDD tests (metrics.py, test_metrics.py)
 - [x] 01-03-PLAN.md -- Reference patterns + templates + workflow stubs (backtest engine, data sources, PineScript, templates)
-- [ ] 01-04-PLAN.md -- Integration test: full install + human verification
+- [x] 01-04-PLAN.md -- Integration test: full install + human verification
 
 ### Phase 2: Milestone Lifecycle & State
 **Goal**: User can create a milestone, track its progress, and provide context files that the system understands
