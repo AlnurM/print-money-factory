@@ -84,8 +84,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md -- new-milestone workflow + template updates (guided scoping, context scan, state management)
-- [ ] 02-02-PLAN.md -- status workflow (ASCII tree display, best metrics, next step)
+- [ ] 04-01-PLAN.md -- Fix data_sources.py yfinance bug + complete execute.md behavioral workflow
+- [ ] 04-02-PLAN.md -- End-to-end human verification of /brrr:execute
 
 ### Phase 5: Verify & Export
 **Goal**: User gets a polished interactive report to evaluate the strategy, can approve it to generate a complete export package, or send it back for another debug cycle with AI diagnosis
@@ -97,11 +97,10 @@ Plans:
   3. User runs `/brrr:verify --approved` and gets an `output/` directory containing valid PineScript v5, trading-rules.md, performance-report.md, backtest_final.py, live-checklist.md, and the HTML report
   4. User runs `/brrr:verify --debug` and the system diagnoses what went wrong, opens a new phase cycle, and the next `/brrr:discuss` starts from the AI diagnosis rather than from scratch
   5. The PineScript export is a valid TradingView strategy that can be pasted directly into the Pine Editor
-**Plans:** 2 plans
+**Plans:** TBD
 
 Plans:
-- [ ] 02-01-PLAN.md -- new-milestone workflow + template updates (guided scoping, context scan, state management)
-- [ ] 02-02-PLAN.md -- status workflow (ASCII tree display, best metrics, next step)
+- [ ] TBD -- planned during Phase 5 planning
 
 ## Progress
 
@@ -110,8 +109,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Package Scaffolding & Install | 3/4 | In Progress|  |
-| 2. Milestone Lifecycle & State | 0/2 | Not started | - |
-| 3. Strategy Specification | 0/3 | Not started | - |
-| 4. AI Backtest Loop | 0/TBD | Not started | - |
+| 1. Package Scaffolding & Install | 4/4 | Complete |  |
+| 2. Milestone Lifecycle & State | 2/2 | Complete | - |
+| 3. Strategy Specification | 3/3 | Complete | - |
+| 4. AI Backtest Loop | 0/2 | Not started | - |
 | 5. Verify & Export | 0/TBD | Not started | - |
