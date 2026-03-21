@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md -- npm package scaffolding + install script (commands, package.json, bin/install.mjs, requirements.txt)
-- [ ] 01-02-PLAN.md -- Fixed metrics module with known-answer TDD tests (metrics.py, test_metrics.py)
+- [x] 01-02-PLAN.md -- Fixed metrics module with known-answer TDD tests (metrics.py, test_metrics.py)
 - [ ] 01-03-PLAN.md -- Reference patterns + templates + workflow stubs (backtest engine, data sources, PineScript, templates)
 - [ ] 01-04-PLAN.md -- Integration test: full install + human verification
 
