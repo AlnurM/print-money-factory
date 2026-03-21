@@ -64,11 +64,12 @@ Plans:
   3. User runs `/brrr:research` and gets back known implementations, academic references, and warnings about lookahead traps specific to their strategy type, saved to `phase_N_research.md`
   4. User runs `/brrr:plan` and gets a complete parameter space definition, optimization method selection, evaluation criteria, data period, and train/test split, saved to `phase_N_plan.md`
   5. When a user drifts significantly from their original strategy during a debug discuss cycle, the system detects it and offers to open a new milestone instead
-**Plans:** 2 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md -- new-milestone workflow + template updates (guided scoping, context scan, state management)
-- [x] 02-02-PLAN.md -- status workflow (ASCII tree display, best metrics, next step)
+- [ ] 03-01-PLAN.md -- Discuss workflow (guided conversation, --auto mode, debug-discuss, drift detection)
+- [ ] 03-02-PLAN.md -- Research workflow (implementations, pitfalls, --deep mode, auto-recommendation)
+- [ ] 03-03-PLAN.md -- Plan workflow (parameter space, optimization method, evaluation criteria, train/test split)
 
 ### Phase 4: AI Backtest Loop
 **Goal**: User runs one command and the system loads market data, writes a custom backtest engine, runs iterative optimization with AI analysis, and stops when targets are hit or the strategy is diagnosed as unviable
@@ -111,6 +112,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Package Scaffolding & Install | 3/4 | In Progress|  |
 | 2. Milestone Lifecycle & State | 0/2 | Not started | - |
-| 3. Strategy Specification | 0/TBD | Not started | - |
+| 3. Strategy Specification | 0/3 | Not started | - |
 | 4. AI Backtest Loop | 0/TBD | Not started | - |
 | 5. Verify & Export | 0/TBD | Not started | - |
