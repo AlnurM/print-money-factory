@@ -30,7 +30,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A Python venv exists at the expected path with pandas, numpy, ccxt, yfinance, plotly, ta, matplotlib, and optuna importable
   4. Running install on a machine without Python 3.10+ fails with a clear, actionable error message
   5. The package contains commands/, workflows/, templates/, references/ directories with a fixed metrics module that has unit tests passing
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 01-01-PLAN.md -- npm package scaffolding + install script (commands, package.json, bin/install.mjs, requirements.txt)
+- [ ] 01-02-PLAN.md -- Fixed metrics module with known-answer TDD tests (metrics.py, test_metrics.py)
+- [ ] 01-03-PLAN.md -- Reference patterns + templates + workflow stubs (backtest engine, data sources, PineScript, templates)
+- [ ] 01-04-PLAN.md -- Integration test: full install + human verification
 
 ### Phase 2: Milestone Lifecycle & State
 **Goal**: User can create a milestone, track its progress, and provide context files that the system understands
@@ -87,7 +93,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Package Scaffolding & Install | 0/TBD | Not started | - |
+| 1. Package Scaffolding & Install | 0/4 | Planning complete | - |
 | 2. Milestone Lifecycle & State | 0/TBD | Not started | - |
 | 3. Strategy Specification | 0/TBD | Not started | - |
 | 4. AI Backtest Loop | 0/TBD | Not started | - |
