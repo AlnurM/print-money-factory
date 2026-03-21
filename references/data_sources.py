@@ -229,6 +229,7 @@ def load_yfinance(
             interval=interval,
             auto_adjust=True,
             progress=False,
+            multi_level_index=False,
         )
     except Exception as e:
         raise ValueError(f"[yfinance] Failed to download {ticker}: {e}")
@@ -325,7 +326,7 @@ def load_csv(
     if date_format:
         df[date_col_actual] = pd.to_datetime(df[date_col_actual], format=date_format)
     else:
-        df[date_col_actual] = pd.to_datetime(df[date_col_actual], infer_datetime_format=True)
+        df[date_col_actual] = pd.to_datetime(df[date_col_actual], format='mixed')
 
     df = df.set_index(date_col_actual)
     df.index.name = 'timestamp'
