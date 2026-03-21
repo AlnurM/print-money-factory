@@ -57,20 +57,20 @@
 
 ### Execute Phase
 
-- [ ] **EXEC-01**: `/brrr:execute` runs AI-driven backtest loop: load data -> run backtest -> compute metrics -> AI analyzes -> adjust params -> repeat
-- [ ] **EXEC-02**: Claude writes Python backtest engine from scratch based on plan phase decisions -- no fixed library
-- [ ] **EXEC-03**: Data sourcing via ccxt (crypto exchanges), yfinance (stocks daily, forex daily), with CSV fallback
-- [ ] **EXEC-04**: Core metrics computed per iteration: Sharpe, Sortino, Calmar, Max DD, Win Rate, Profit Factor, expectancy, trade count, net P&L
-- [ ] **EXEC-05**: Commission and slippage modeling included from first iteration -- configurable per-trade flat or percentage
-- [ ] **EXEC-06**: In-sample / out-of-sample split enforced -- metrics reported separately for both
-- [ ] **EXEC-07**: Walk-forward analysis available as optimization method -- rolling train/test windows
-- [ ] **EXEC-08**: Stop conditions: MINT (targets hit), PLATEAU (3 iterations without >5% improvement), REKT (no edge at any params), NO DATA
-- [ ] **EXEC-09**: AI reads metrics and equity curve each iteration, diagnoses what's working/not, decides next parameter adjustment
-- [ ] **EXEC-10**: Per-iteration artifacts saved: params JSON, metrics JSON, equity PNG (matplotlib), verdict JSON
-- [ ] **EXEC-11**: Real-time terminal display showing iteration progress, current params, metrics, AI commentary
-- [ ] **EXEC-12**: `--iterations N` flag (default 10), `--fast` (no charts), `--resume` (continue from last iteration)
-- [ ] **EXEC-13**: Overfitting detection -- warns when in-sample/out-of-sample diverge significantly or metrics look too good
-- [ ] **EXEC-14**: Outputs `phase_N_best_result.json`
+- [x] **EXEC-01**: `/brrr:execute` runs AI-driven backtest loop: load data -> run backtest -> compute metrics -> AI analyzes -> adjust params -> repeat
+- [x] **EXEC-02**: Claude writes Python backtest engine from scratch based on plan phase decisions -- no fixed library
+- [x] **EXEC-03**: Data sourcing via ccxt (crypto exchanges), yfinance (stocks daily, forex daily), with CSV fallback
+- [x] **EXEC-04**: Core metrics computed per iteration: Sharpe, Sortino, Calmar, Max DD, Win Rate, Profit Factor, expectancy, trade count, net P&L
+- [x] **EXEC-05**: Commission and slippage modeling included from first iteration -- configurable per-trade flat or percentage
+- [x] **EXEC-06**: In-sample / out-of-sample split enforced -- metrics reported separately for both
+- [x] **EXEC-07**: Walk-forward analysis available as optimization method -- rolling train/test windows
+- [x] **EXEC-08**: Stop conditions: MINT (targets hit), PLATEAU (3 iterations without >5% improvement), REKT (no edge at any params), NO DATA
+- [x] **EXEC-09**: AI reads metrics and equity curve each iteration, diagnoses what's working/not, decides next parameter adjustment
+- [x] **EXEC-10**: Per-iteration artifacts saved: params JSON, metrics JSON, equity PNG (matplotlib), verdict JSON
+- [x] **EXEC-11**: Real-time terminal display showing iteration progress, current params, metrics, AI commentary
+- [x] **EXEC-12**: `--iterations N` flag (default 10), `--fast` (no charts), `--resume` (continue from last iteration)
+- [x] **EXEC-13**: Overfitting detection -- warns when in-sample/out-of-sample diverge significantly or metrics look too good
+- [x] **EXEC-14**: Outputs `phase_N_best_result.json`
 
 ### Verify Phase
 
@@ -107,11 +107,11 @@
 
 ### Data Sources
 
-- [ ] **DATA-01**: ccxt integration for crypto -- auto-detect exchange from user's trading exchange for data fidelity
-- [ ] **DATA-02**: yfinance integration for stocks (daily) and forex (daily)
-- [ ] **DATA-03**: CSV fallback for any asset -- user provides historical data file
-- [ ] **DATA-04**: Data validation before every backtest -- check for gaps, NaN values, timezone issues
-- [ ] **DATA-05**: Local data caching to avoid re-downloading
+- [x] **DATA-01**: ccxt integration for crypto -- auto-detect exchange from user's trading exchange for data fidelity
+- [x] **DATA-02**: yfinance integration for stocks (daily) and forex (daily)
+- [x] **DATA-03**: CSV fallback for any asset -- user provides historical data file
+- [x] **DATA-04**: Data validation before every backtest -- check for gaps, NaN values, timezone issues
+- [x] **DATA-05**: Local data caching to avoid re-downloading
 
 ### Package Architecture
 
@@ -195,20 +195,20 @@
 | PLAN-06 | Phase 3 | Complete |
 | PLAN-07 | Phase 3 | Complete |
 | PLAN-08 | Phase 3 | Complete |
-| EXEC-01 | Phase 4 | Pending |
-| EXEC-02 | Phase 4 | Pending |
-| EXEC-03 | Phase 4 | Pending |
-| EXEC-04 | Phase 4 | Pending |
-| EXEC-05 | Phase 4 | Pending |
-| EXEC-06 | Phase 4 | Pending |
-| EXEC-07 | Phase 4 | Pending |
-| EXEC-08 | Phase 4 | Pending |
-| EXEC-09 | Phase 4 | Pending |
-| EXEC-10 | Phase 4 | Pending |
-| EXEC-11 | Phase 4 | Pending |
-| EXEC-12 | Phase 4 | Pending |
-| EXEC-13 | Phase 4 | Pending |
-| EXEC-14 | Phase 4 | Pending |
+| EXEC-01 | Phase 4 | Complete |
+| EXEC-02 | Phase 4 | Complete |
+| EXEC-03 | Phase 4 | Complete |
+| EXEC-04 | Phase 4 | Complete |
+| EXEC-05 | Phase 4 | Complete |
+| EXEC-06 | Phase 4 | Complete |
+| EXEC-07 | Phase 4 | Complete |
+| EXEC-08 | Phase 4 | Complete |
+| EXEC-09 | Phase 4 | Complete |
+| EXEC-10 | Phase 4 | Complete |
+| EXEC-11 | Phase 4 | Complete |
+| EXEC-12 | Phase 4 | Complete |
+| EXEC-13 | Phase 4 | Complete |
+| EXEC-14 | Phase 4 | Complete |
 | VRFY-01 | Phase 5 | Pending |
 | VRFY-02 | Phase 5 | Pending |
 | VRFY-03 | Phase 5 | Pending |
@@ -233,11 +233,11 @@
 | STAT-03 | Phase 2 | Complete |
 | STAT-04 | Phase 2 | Complete |
 | STAT-05 | Phase 2 | Complete |
-| DATA-01 | Phase 4 | Pending |
-| DATA-02 | Phase 4 | Pending |
-| DATA-03 | Phase 4 | Pending |
-| DATA-04 | Phase 4 | Pending |
-| DATA-05 | Phase 4 | Pending |
+| DATA-01 | Phase 4 | Complete |
+| DATA-02 | Phase 4 | Complete |
+| DATA-03 | Phase 4 | Complete |
+| DATA-04 | Phase 4 | Complete |
+| DATA-05 | Phase 4 | Complete |
 | ARCH-01 | Phase 1 | Complete |
 | ARCH-02 | Phase 1 | Complete |
 | ARCH-03 | Phase 1 | Complete |
