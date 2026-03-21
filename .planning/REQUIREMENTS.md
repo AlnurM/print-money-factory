@@ -74,15 +74,15 @@
 
 ### Verify Phase
 
-- [ ] **VRFY-01**: `/brrr:verify` generates interactive standalone HTML report (plotly, no server)
-- [ ] **VRFY-02**: Report includes equity curve (strategy vs buy & hold) with zoom
-- [ ] **VRFY-03**: Report includes drawdown chart with max drawdown line
-- [ ] **VRFY-04**: Report includes iteration table -- all iterations with params and how Sharpe evolved
-- [ ] **VRFY-05**: Report includes parameter heatmap (if grid search was used)
-- [ ] **VRFY-06**: Report includes trade list with per-trade P&L coloring
-- [ ] **VRFY-07**: Report includes regime breakdown -- performance in bull/bear/sideways
-- [ ] **VRFY-08**: Report includes benchmark correlation -- alpha, beta vs buy-and-hold
-- [ ] **VRFY-09**: Report includes metrics summary table -- all metrics vs targets
+- [x] **VRFY-01**: `/brrr:verify` generates interactive standalone HTML report (plotly, no server)
+- [x] **VRFY-02**: Report includes equity curve (strategy vs buy & hold) with zoom
+- [x] **VRFY-03**: Report includes drawdown chart with max drawdown line
+- [x] **VRFY-04**: Report includes iteration table -- all iterations with params and how Sharpe evolved
+- [x] **VRFY-05**: Report includes parameter heatmap (if grid search was used)
+- [x] **VRFY-06**: Report includes trade list with per-trade P&L coloring
+- [x] **VRFY-07**: Report includes regime breakdown -- performance in bull/bear/sideways
+- [x] **VRFY-08**: Report includes benchmark correlation -- alpha, beta vs buy-and-hold
+- [x] **VRFY-09**: Report includes metrics summary table -- all metrics vs targets
 - [ ] **VRFY-10**: AI analyzes full report and formulates conclusion with specific assessment
 - [ ] **VRFY-11**: `--approved` closes milestone, triggers export package generation
 - [ ] **VRFY-12**: `--debug` keeps milestone open, AI diagnoses failure, opens new phase cycle with diagnosis as starting point
@@ -209,15 +209,15 @@
 | EXEC-12 | Phase 4 | Complete |
 | EXEC-13 | Phase 4 | Complete |
 | EXEC-14 | Phase 4 | Complete |
-| VRFY-01 | Phase 5 | Pending |
-| VRFY-02 | Phase 5 | Pending |
-| VRFY-03 | Phase 5 | Pending |
-| VRFY-04 | Phase 5 | Pending |
-| VRFY-05 | Phase 5 | Pending |
-| VRFY-06 | Phase 5 | Pending |
-| VRFY-07 | Phase 5 | Pending |
-| VRFY-08 | Phase 5 | Pending |
-| VRFY-09 | Phase 5 | Pending |
+| VRFY-01 | Phase 5 | Complete |
+| VRFY-02 | Phase 5 | Complete |
+| VRFY-03 | Phase 5 | Complete |
+| VRFY-04 | Phase 5 | Complete |
+| VRFY-05 | Phase 5 | Complete |
+| VRFY-06 | Phase 5 | Complete |
+| VRFY-07 | Phase 5 | Complete |
+| VRFY-08 | Phase 5 | Complete |
+| VRFY-09 | Phase 5 | Complete |
 | VRFY-10 | Phase 5 | Pending |
 | VRFY-11 | Phase 5 | Pending |
 | VRFY-12 | Phase 5 | Pending |
