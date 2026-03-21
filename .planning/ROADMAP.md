@@ -67,9 +67,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md -- Discuss workflow (guided conversation, --auto mode, debug-discuss, drift detection)
-- [ ] 03-02-PLAN.md -- Research workflow (implementations, pitfalls, --deep mode, auto-recommendation)
-- [ ] 03-03-PLAN.md -- Plan workflow (parameter space, optimization method, evaluation criteria, train/test split)
+- [x] 03-01-PLAN.md -- Discuss workflow (guided conversation, --auto mode, debug-discuss, drift detection)
+- [x] 03-02-PLAN.md -- Research workflow (implementations, pitfalls, --deep mode, auto-recommendation)
+- [x] 03-03-PLAN.md -- Plan workflow (parameter space, optimization method, evaluation criteria, train/test split)
 
 ### Phase 4: AI Backtest Loop
 **Goal**: User runs one command and the system loads market data, writes a custom backtest engine, runs iterative optimization with AI analysis, and stops when targets are hit or the strategy is diagnosed as unviable

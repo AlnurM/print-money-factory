@@ -38,11 +38,11 @@
 
 ### Research Phase
 
-- [ ] **RSCH-01**: `/brrr:research` finds known implementations, academic work, and formalization alternatives for the strategy type
-- [ ] **RSCH-02**: Warns about known lookahead traps specific to the strategy type
-- [ ] **RSCH-03**: Recommends when research is needed (non-standard strategies) vs optional (classic strategies)
-- [ ] **RSCH-04**: `--deep` flag for extended search across multiple sources
-- [ ] **RSCH-05**: Outputs `phase_N_research.md`
+- [x] **RSCH-01**: `/brrr:research` finds known implementations, academic work, and formalization alternatives for the strategy type
+- [x] **RSCH-02**: Warns about known lookahead traps specific to the strategy type
+- [x] **RSCH-03**: Recommends when research is needed (non-standard strategies) vs optional (classic strategies)
+- [x] **RSCH-04**: `--deep` flag for extended search across multiple sources
+- [x] **RSCH-05**: Outputs `phase_N_research.md`
 
 ### Plan Phase
 
@@ -182,11 +182,11 @@
 | DISC-04 | Phase 3 | Pending |
 | DISC-05 | Phase 3 | Pending |
 | DISC-06 | Phase 3 | Pending |
-| RSCH-01 | Phase 3 | Pending |
-| RSCH-02 | Phase 3 | Pending |
-| RSCH-03 | Phase 3 | Pending |
-| RSCH-04 | Phase 3 | Pending |
-| RSCH-05 | Phase 3 | Pending |
+| RSCH-01 | Phase 3 | Complete |
+| RSCH-02 | Phase 3 | Complete |
+| RSCH-03 | Phase 3 | Complete |
+| RSCH-04 | Phase 3 | Complete |
+| RSCH-05 | Phase 3 | Complete |
 | PLAN-01 | Phase 3 | Pending |
 | PLAN-02 | Phase 3 | Pending |
 | PLAN-03 | Phase 3 | Pending |
