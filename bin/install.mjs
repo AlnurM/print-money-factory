@@ -97,9 +97,10 @@ Then run this command again.
  * creates/updates a Python venv, and verifies the installation.
  */
 function main() {
-  // Check for install subcommand
-  if (process.argv[2] !== 'install') {
-    console.log('Usage: npx print-money-factory install');
+  // Accept "install" arg or no args (npx calls without args)
+  const cmd = process.argv[2];
+  if (cmd && cmd !== 'install') {
+    console.log('Usage: npx @print-money-factory/cli [install]');
     process.exit(1);
   }
 
