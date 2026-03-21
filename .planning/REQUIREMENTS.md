@@ -46,14 +46,14 @@
 
 ### Plan Phase
 
-- [ ] **PLAN-01**: `/brrr:plan` defines parameter space -- fixed params and free params with ranges and step sizes
-- [ ] **PLAN-02**: Defines constraints between parameters (e.g., fast_period < slow_period)
-- [ ] **PLAN-03**: Selects optimization method: grid search (< 1000 combos), random search, walk-forward (3+ free params, recommended)
-- [ ] **PLAN-04**: Sets evaluation criteria: primary metric (Sharpe), secondary metrics (Max DD, Win Rate, Profit Factor)
-- [ ] **PLAN-05**: Enforces minimum trade count threshold (default 30)
-- [ ] **PLAN-06**: Defines data period, timeframe, and train/test split
-- [ ] **PLAN-07**: Enforces parameter budget to prevent overfitting (limits on number of free parameters vs data size)
-- [ ] **PLAN-08**: Outputs `phase_N_plan.md`
+- [x] **PLAN-01**: `/brrr:plan` defines parameter space -- fixed params and free params with ranges and step sizes
+- [x] **PLAN-02**: Defines constraints between parameters (e.g., fast_period < slow_period)
+- [x] **PLAN-03**: Selects optimization method: grid search (< 1000 combos), random search, walk-forward (3+ free params, recommended)
+- [x] **PLAN-04**: Sets evaluation criteria: primary metric (Sharpe), secondary metrics (Max DD, Win Rate, Profit Factor)
+- [x] **PLAN-05**: Enforces minimum trade count threshold (default 30)
+- [x] **PLAN-06**: Defines data period, timeframe, and train/test split
+- [x] **PLAN-07**: Enforces parameter budget to prevent overfitting (limits on number of free parameters vs data size)
+- [x] **PLAN-08**: Outputs `phase_N_plan.md`
 
 ### Execute Phase
 
@@ -187,14 +187,14 @@
 | RSCH-03 | Phase 3 | Complete |
 | RSCH-04 | Phase 3 | Complete |
 | RSCH-05 | Phase 3 | Complete |
-| PLAN-01 | Phase 3 | Pending |
-| PLAN-02 | Phase 3 | Pending |
-| PLAN-03 | Phase 3 | Pending |
-| PLAN-04 | Phase 3 | Pending |
-| PLAN-05 | Phase 3 | Pending |
-| PLAN-06 | Phase 3 | Pending |
-| PLAN-07 | Phase 3 | Pending |
-| PLAN-08 | Phase 3 | Pending |
+| PLAN-01 | Phase 3 | Complete |
+| PLAN-02 | Phase 3 | Complete |
+| PLAN-03 | Phase 3 | Complete |
+| PLAN-04 | Phase 3 | Complete |
+| PLAN-05 | Phase 3 | Complete |
+| PLAN-06 | Phase 3 | Complete |
+| PLAN-07 | Phase 3 | Complete |
+| PLAN-08 | Phase 3 | Complete |
 | EXEC-01 | Phase 4 | Pending |
 | EXEC-02 | Phase 4 | Pending |
 | EXEC-03 | Phase 4 | Pending |
