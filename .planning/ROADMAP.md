@@ -51,7 +51,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md -- new-milestone workflow + template updates (guided scoping, context scan, state management)
+- [x] 02-01-PLAN.md -- new-milestone workflow + template updates (guided scoping, context scan, state management)
 - [x] 02-02-PLAN.md -- status workflow (ASCII tree display, best metrics, next step)
 
 ### Phase 3: Strategy Specification
@@ -68,7 +68,7 @@ Plans:
 
 Plans:
 - [ ] 02-01-PLAN.md -- new-milestone workflow + template updates (guided scoping, context scan, state management)
-- [ ] 02-02-PLAN.md -- status workflow (ASCII tree display, best metrics, next step)
+- [x] 02-02-PLAN.md -- status workflow (ASCII tree display, best metrics, next step)
 
 ### Phase 4: AI Backtest Loop
 **Goal**: User runs one command and the system loads market data, writes a custom backtest engine, runs iterative optimization with AI analysis, and stops when targets are hit or the strategy is diagnosed as unviable

@@ -15,17 +15,17 @@
 
 ### Milestone Management
 
-- [ ] **MILE-01**: `/brrr:new-milestone` creates milestone with strategy idea, scope selection, asset/data source, and success criteria
-- [ ] **MILE-02**: Scope selection includes: strategy, backtest, tuning, risk management, PineScript export, MD instructions export
-- [ ] **MILE-03**: System recommends scope splitting when selection is too large
-- [ ] **MILE-04**: One active milestone at a time -- new milestone only after current is approved
+- [x] **MILE-01**: `/brrr:new-milestone` creates milestone with strategy idea, scope selection, asset/data source, and success criteria
+- [x] **MILE-02**: Scope selection includes: strategy, backtest, tuning, risk management, PineScript export, MD instructions export
+- [x] **MILE-03**: System recommends scope splitting when selection is too large
+- [x] **MILE-04**: One active milestone at a time -- new milestone only after current is approved
 - [x] **MILE-05**: `/brrr:status` shows ASCII tree of milestone progress, all phases, next step
 
 ### Context Files
 
-- [ ] **CTXT-01**: System checks `.pmf/context/` at start of each command for new files (images, PDFs, screenshots)
-- [ ] **CTXT-02**: System parses and describes what it sees in context files, asks user for confirmation before incorporating
-- [ ] **CTXT-03**: Context files are included in subsequent phase artifacts after confirmation
+- [x] **CTXT-01**: System checks `.pmf/context/` at start of each command for new files (images, PDFs, screenshots)
+- [x] **CTXT-02**: System parses and describes what it sees in context files, asks user for confirmation before incorporating
+- [x] **CTXT-03**: Context files are included in subsequent phase artifacts after confirmation
 
 ### Discuss Phase
 
@@ -99,11 +99,11 @@
 
 ### State Management
 
-- [ ] **STAT-01**: STATE.md tracks current milestone, status, all phases with step completion
+- [x] **STAT-01**: STATE.md tracks current milestone, status, all phases with step completion
 - [x] **STAT-02**: STATE.md records best metrics per phase (Sharpe, DD, trades)
-- [ ] **STAT-03**: Commands validate sequence -- cannot run execute without plan, verify without execute
-- [ ] **STAT-04**: STRATEGY.md captures original hypothesis and scope from new-milestone
-- [ ] **STAT-05**: Phase artifacts are append-only -- history never overwritten
+- [x] **STAT-03**: Commands validate sequence -- cannot run execute without plan, verify without execute
+- [x] **STAT-04**: STRATEGY.md captures original hypothesis and scope from new-milestone
+- [x] **STAT-05**: Phase artifacts are append-only -- history never overwritten
 
 ### Data Sources
 
@@ -168,14 +168,14 @@
 | INST-03 | Phase 1 | Complete |
 | INST-04 | Phase 1 | Complete |
 | INST-05 | Phase 1 | Complete |
-| MILE-01 | Phase 2 | Pending |
-| MILE-02 | Phase 2 | Pending |
-| MILE-03 | Phase 2 | Pending |
-| MILE-04 | Phase 2 | Pending |
+| MILE-01 | Phase 2 | Complete |
+| MILE-02 | Phase 2 | Complete |
+| MILE-03 | Phase 2 | Complete |
+| MILE-04 | Phase 2 | Complete |
 | MILE-05 | Phase 2 | Complete |
-| CTXT-01 | Phase 2 | Pending |
-| CTXT-02 | Phase 2 | Pending |
-| CTXT-03 | Phase 2 | Pending |
+| CTXT-01 | Phase 2 | Complete |
+| CTXT-02 | Phase 2 | Complete |
+| CTXT-03 | Phase 2 | Complete |
 | DISC-01 | Phase 3 | Pending |
 | DISC-02 | Phase 3 | Pending |
 | DISC-03 | Phase 3 | Pending |
@@ -228,11 +228,11 @@
 | EXPT-05 | Phase 5 | Pending |
 | EXPT-06 | Phase 5 | Pending |
 | EXPT-07 | Phase 5 | Pending |
-| STAT-01 | Phase 2 | Pending |
+| STAT-01 | Phase 2 | Complete |
 | STAT-02 | Phase 2 | Complete |
-| STAT-03 | Phase 2 | Pending |
-| STAT-04 | Phase 2 | Pending |
-| STAT-05 | Phase 2 | Pending |
+| STAT-03 | Phase 2 | Complete |
+| STAT-04 | Phase 2 | Complete |
+| STAT-05 | Phase 2 | Complete |
 | DATA-01 | Phase 4 | Pending |
 | DATA-02 | Phase 4 | Pending |
 | DATA-03 | Phase 4 | Pending |
