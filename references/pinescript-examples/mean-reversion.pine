@@ -1,0 +1,51 @@
+//@version=5
+strategy("Bollinger Band Mean Reversion", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.1)
+
+// === INPUTS ===
+bbLength = input.int(20, "Bollinger Band Period", minval=5, maxval=200)
+bbMult = input.float(2.0, "Bollinger Band StdDev", minval=0.5, maxval=4.0, step=0.1)
+atrLength = input.int(14, "ATR Period for Stop", minval=5, maxval=50)
+atrMultiplier = input.float(1.5, "ATR Stop Multiplier", minval=0.5, maxval=5.0, step=0.1)
+
+// === INDICATORS ===
+[bbMiddle, bbUpper, bbLower] = ta.bb(close, bbLength, bbMult)
+atrValue = ta.atr(atrLength)
+
+// === SIGNALS ===
+// Long: price touches or crosses below lower band
+longCondition = ta.crossunder(close, bbLower)
+// Close long: price reaches middle band
+closeLongCondition = ta.crossover(close, bbMiddle)
+
+// Short: price touches or crosses above upper band
+shortCondition = ta.crossover(close, bbUpper)
+// Close short: price reaches middle band
+closeShortCondition = ta.crossunder(close, bbMiddle)
+
+// === EXECUTION ===
+if longCondition
+    strategy.entry("Long", strategy.long)
+
+if closeLongCondition
+    strategy.close("Long")
+
+if shortCondition
+    strategy.entry("Short", strategy.short)
+
+if closeShortCondition
+    strategy.close("Short")
+
+// ATR-based stop loss
+if strategy.position_size > 0
+    longStop = strategy.position_avg_price - atrValue * atrMultiplier
+    strategy.exit("Long SL", "Long", stop=longStop)
+
+if strategy.position_size < 0
+    shortStop = strategy.position_avg_price + atrValue * atrMultiplier
+    strategy.exit("Short SL", "Short", stop=shortStop)
+
+// === PLOTTING ===
+plot(bbMiddle, "BB Middle", color=color.yellow, linewidth=1)
+plot(bbUpper, "BB Upper", color=color.red, linewidth=1)
+plot(bbLower, "BB Lower", color=color.green, linewidth=1)
+fill(plot(bbUpper, display=display.none), plot(bbLower, display=display.none), color=color.new(color.gray, 90))

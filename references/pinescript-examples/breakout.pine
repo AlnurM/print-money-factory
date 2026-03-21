@@ -1,0 +1,41 @@
+//@version=5
+strategy("Donchian Channel Breakout", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.1)
+
+// === INPUTS ===
+dcLength = input.int(20, "Donchian Channel Period", minval=5, maxval=200)
+atrLength = input.int(14, "ATR Period for Trailing Stop", minval=5, maxval=50)
+atrMultiplier = input.float(2.0, "ATR Trailing Stop Multiplier", minval=0.5, maxval=5.0, step=0.1)
+
+// === INDICATORS ===
+dcUpper = ta.highest(high, dcLength)
+dcLower = ta.lowest(low, dcLength)
+dcMiddle = (dcUpper + dcLower) / 2
+atrValue = ta.atr(atrLength)
+
+// === SIGNALS ===
+// Long on upper channel breakout
+longCondition = ta.crossover(close, dcUpper[1])
+// Short on lower channel breakout
+shortCondition = ta.crossunder(close, dcLower[1])
+
+// === EXECUTION ===
+if longCondition
+    strategy.entry("Long", strategy.long)
+
+if shortCondition
+    strategy.entry("Short", strategy.short)
+
+// Trailing stop using ATR
+if strategy.position_size > 0
+    trailStop = close - atrValue * atrMultiplier
+    strategy.exit("Long Trail", "Long", stop=trailStop)
+
+if strategy.position_size < 0
+    trailStop = close + atrValue * atrMultiplier
+    strategy.exit("Short Trail", "Short", stop=trailStop)
+
+// === PLOTTING ===
+plot(dcUpper, "DC Upper", color=color.green, linewidth=2)
+plot(dcLower, "DC Lower", color=color.red, linewidth=2)
+plot(dcMiddle, "DC Middle", color=color.gray, linewidth=1, style=plot.style_cross)
+fill(plot(dcUpper, display=display.none), plot(dcLower, display=display.none), color=color.new(color.blue, 90))

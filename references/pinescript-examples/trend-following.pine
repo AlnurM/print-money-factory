@@ -1,0 +1,34 @@
+//@version=5
+strategy("EMA Crossover Trend Following", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.1)
+
+// === INPUTS ===
+fastLength = input.int(10, "Fast EMA Period", minval=1, maxval=200)
+slowLength = input.int(50, "Slow EMA Period", minval=1, maxval=500)
+stopLossPercent = input.float(2.0, "Stop Loss %", minval=0.1, maxval=20.0, step=0.1)
+
+// === INDICATORS ===
+fastEMA = ta.ema(close, fastLength)
+slowEMA = ta.ema(close, slowLength)
+
+// === SIGNALS ===
+longCondition = ta.crossover(fastEMA, slowEMA)
+shortCondition = ta.crossunder(fastEMA, slowEMA)
+
+// === EXECUTION ===
+if longCondition
+    strategy.entry("Long", strategy.long)
+
+if shortCondition
+    strategy.close("Long")
+
+// Stop loss
+if strategy.position_size > 0
+    stopPrice = strategy.position_avg_price * (1 - stopLossPercent / 100)
+    strategy.exit("Stop Loss", "Long", stop=stopPrice)
+
+// === PLOTTING ===
+plot(fastEMA, "Fast EMA", color=color.blue, linewidth=2)
+plot(slowEMA, "Slow EMA", color=color.red, linewidth=2)
+
+// Background color for trend direction
+bgcolor(fastEMA > slowEMA ? color.new(color.green, 90) : color.new(color.red, 90))

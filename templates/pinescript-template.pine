@@ -1,0 +1,40 @@
+//@version=5
+strategy("{{STRATEGY_NAME}}", overlay=true, initial_capital={{INITIAL_CAPITAL}}, default_qty_type=strategy.percent_of_equity, default_qty_value={{QTY_PERCENT}}, commission_type=strategy.commission.percent, commission_value={{COMMISSION_PCT}})
+
+// === INPUTS ===
+// Define strategy parameters as input() calls so users can adjust in TradingView UI.
+// {{PARAMETER_INPUTS}}
+// Example:
+// fastLength = input.int(10, "Fast Period", minval=1)
+// slowLength = input.int(50, "Slow Period", minval=1)
+
+// === INDICATORS ===
+// Calculate technical indicators used for entry/exit signals.
+// {{INDICATOR_CALCULATIONS}}
+// Example:
+// fastMA = ta.ema(close, fastLength)
+// slowMA = ta.ema(close, slowLength)
+
+// === SIGNALS ===
+// Define entry and exit conditions as boolean expressions.
+// {{ENTRY_EXIT_CONDITIONS}}
+// Example:
+// longCondition = ta.crossover(fastMA, slowMA)
+// shortCondition = ta.crossunder(fastMA, slowMA)
+
+// === EXECUTION ===
+// Use strategy.entry() and strategy.close() to place orders.
+// strategy.exit() for stop losses and take profits.
+// {{STRATEGY_ENTRY_EXIT_CALLS}}
+// Example:
+// if longCondition
+//     strategy.entry("Long", strategy.long)
+// if shortCondition
+//     strategy.close("Long")
+
+// === PLOTTING ===
+// Plot indicators on the chart for visual confirmation.
+// {{PLOT_INDICATORS}}
+// Example:
+// plot(fastMA, "Fast MA", color=color.blue)
+// plot(slowMA, "Slow MA", color=color.red)
