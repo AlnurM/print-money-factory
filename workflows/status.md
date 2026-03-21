@@ -92,7 +92,7 @@ Print Money Factory -- Status
     [    ] execute
     [    ] verify
 
-  Next step: /brrr:{command}
+  Next step: `/brrr:{command}`
 ```
 
 ### Icon rules
@@ -135,7 +135,7 @@ After rendering the tree, determine the actionable next step:
 2. The current step IS the next action the user needs to take.
 3. Display at the bottom of the tree:
    ```
-   Next step: /brrr:{current_step}
+   Next step: `/brrr:{current_step}`
    ```
 4. **Special cases:**
    - If `milestone_status` is "APPROVED" or "CLOSED":

@@ -323,7 +323,7 @@ Files created:
   .pmf/STRATEGY.md -- strategy definition and scope
   .pmf/STATE.md    -- milestone state tracker
 
-Next step: /brrr:discuss
+Next step: `/brrr:discuss`
 ```
 
 ---
@@ -361,7 +361,7 @@ Current position:
     {step_icon} execute    {status}
     {step_icon} verify     {status}
 
-Next step: /brrr:{next_command}
+Next step: `/brrr:{next_command}`
 ```
 
 ### Prerequisite Explanations

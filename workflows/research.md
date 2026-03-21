@@ -18,7 +18,7 @@ Before anything else, verify the discuss step is complete for the current phase.
 
 No milestone exists. Create one first to define your strategy scope and targets.
 
-Next step: /brrr:new-milestone
+Next step: `/brrr:new-milestone`
 ```
 
 3. If the file exists, read it and find:
@@ -42,7 +42,7 @@ Current position:
     {step_icon} execute    {status}
     {step_icon} verify     {status}
 
-Next step: /brrr:discuss
+Next step: `/brrr:discuss`
 ```
 
 6. If discuss IS done, proceed. Note: **Research is recommended but optional. You can skip to /brrr:plan if your strategy is well-understood.** Since the user already ran the command, proceed with research.
@@ -402,7 +402,7 @@ Artifact: .pmf/phases/phase_{N}_research.md
 Pitfalls: {count} identified ({HIGH count} high risk)
 Sources: {count} consulted
 
-Next step: /brrr:plan
+Next step: `/brrr:plan`
 ```
 
 ---
