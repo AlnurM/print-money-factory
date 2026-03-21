@@ -48,7 +48,11 @@ Plans:
   3. Running a command out of sequence (e.g., `/brrr:execute` before plan) is refused with a clear message about what to run first
   4. Dropping an image or PDF into `.pmf/context/` causes the next command to describe what it sees and ask for confirmation before incorporating
   5. User cannot start a new milestone while one is active -- system tells them to approve or abandon the current one first
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 02-01-PLAN.md -- new-milestone workflow + template updates (guided scoping, context scan, state management)
+- [ ] 02-02-PLAN.md -- status workflow (ASCII tree display, best metrics, next step)
 
 ### Phase 3: Strategy Specification
 **Goal**: User can go from a vague trading idea to a complete, formal backtest specification through guided conversation, optional research, and structured planning
@@ -60,7 +64,11 @@ Plans:
   3. User runs `/brrr:research` and gets back known implementations, academic references, and warnings about lookahead traps specific to their strategy type, saved to `phase_N_research.md`
   4. User runs `/brrr:plan` and gets a complete parameter space definition, optimization method selection, evaluation criteria, data period, and train/test split, saved to `phase_N_plan.md`
   5. When a user drifts significantly from their original strategy during a debug discuss cycle, the system detects it and offers to open a new milestone instead
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 02-01-PLAN.md -- new-milestone workflow + template updates (guided scoping, context scan, state management)
+- [ ] 02-02-PLAN.md -- status workflow (ASCII tree display, best metrics, next step)
 
 ### Phase 4: AI Backtest Loop
 **Goal**: User runs one command and the system loads market data, writes a custom backtest engine, runs iterative optimization with AI analysis, and stops when targets are hit or the strategy is diagnosed as unviable
@@ -72,7 +80,11 @@ Plans:
   3. The loop stops automatically on one of four conditions: MINT (targets hit), PLATEAU (no improvement), REKT (no edge found), or NO DATA -- and the user sees which condition triggered
   4. In-sample and out-of-sample metrics are reported separately, and the system warns when they diverge significantly (overfitting signal)
   5. Data loads successfully from at least ccxt (crypto) and yfinance (stocks), with CSV fallback working for any asset, and data is validated for gaps/NaN before every backtest run
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 02-01-PLAN.md -- new-milestone workflow + template updates (guided scoping, context scan, state management)
+- [ ] 02-02-PLAN.md -- status workflow (ASCII tree display, best metrics, next step)
 
 ### Phase 5: Verify & Export
 **Goal**: User gets a polished interactive report to evaluate the strategy, can approve it to generate a complete export package, or send it back for another debug cycle with AI diagnosis
@@ -84,7 +96,11 @@ Plans:
   3. User runs `/brrr:verify --approved` and gets an `output/` directory containing valid PineScript v5, trading-rules.md, performance-report.md, backtest_final.py, live-checklist.md, and the HTML report
   4. User runs `/brrr:verify --debug` and the system diagnoses what went wrong, opens a new phase cycle, and the next `/brrr:discuss` starts from the AI diagnosis rather than from scratch
   5. The PineScript export is a valid TradingView strategy that can be pasted directly into the Pine Editor
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 02-01-PLAN.md -- new-milestone workflow + template updates (guided scoping, context scan, state management)
+- [ ] 02-02-PLAN.md -- status workflow (ASCII tree display, best metrics, next step)
 
 ## Progress
 
@@ -94,7 +110,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Package Scaffolding & Install | 3/4 | In Progress|  |
-| 2. Milestone Lifecycle & State | 0/TBD | Not started | - |
+| 2. Milestone Lifecycle & State | 0/2 | Not started | - |
 | 3. Strategy Specification | 0/TBD | Not started | - |
 | 4. AI Backtest Loop | 0/TBD | Not started | - |
 | 5. Verify & Export | 0/TBD | Not started | - |
