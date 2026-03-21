@@ -66,19 +66,19 @@ For each new file (up to 5), process based on type:
 ### Images (PNG, JPG, JPEG, GIF, WEBP)
 1. Use the Read tool to view the image file
 2. Describe what you see: chart patterns, indicators, annotations, timeframe, asset, any visible text
-3. Ask the user: "Is this understanding correct? Anything to add or correct?"
+3. Use AskUserQuestion with header "Context", question "Is this understanding correct?", options: "Yes, correct" (confirm and continue), "Not quite" (user explains correction via Other).
 4. Wait for the user's response
 
 ### PDF files
 1. Use the Read tool with the `pages` parameter to read the PDF (start with pages "1-5")
 2. Summarize content relevant to trading strategy development
-3. Ask the user: "Is this understanding correct? Anything to add or correct?"
+3. Use AskUserQuestion with header "Context", question "Is this understanding correct?", options: "Yes, correct" (confirm and continue), "Not quite" (user explains correction via Other).
 4. Wait for the user's response
 
 ### Text files (.txt, .md, .csv, .json)
 1. Use the Read tool to read the file content
 2. Summarize what is relevant to trading strategy development
-3. Ask the user: "Is this understanding correct? Anything to add or correct?"
+3. Use AskUserQuestion with header "Context", question "Is this understanding correct?", options: "Yes, correct" (confirm and continue), "Not quite" (user explains correction via Other).
 4. Wait for the user's response
 
 After each file is confirmed, record the filename, date, and one-line description.

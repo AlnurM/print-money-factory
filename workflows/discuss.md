@@ -120,19 +120,19 @@ For each new file (up to 5), process based on type:
 1. Use the Read tool to view the image file -- you will see it visually
 2. Describe in detail what you see: chart patterns, indicators, annotations, timeframe, asset, any visible text or labels
 3. State your interpretation of how this image relates to the trading strategy
-4. Ask the user: "Is this understanding correct? Anything to add or correct?"
+4. Use AskUserQuestion with header "Context", question "Is this understanding correct?", options: "Yes, correct" (confirm and continue), "Not quite" (user explains correction via Other).
 5. Wait for the user's response before moving to the next file
 
 ### PDF files
 1. Use the Read tool with the `pages` parameter to read the PDF (start with pages "1-5")
 2. Summarize the content that is relevant to trading strategy development
-3. Ask the user: "Is this understanding correct? Anything to add or correct?"
+3. Use AskUserQuestion with header "Context", question "Is this understanding correct?", options: "Yes, correct" (confirm and continue), "Not quite" (user explains correction via Other).
 4. Wait for the user's response
 
 ### Text files (.txt, .md, .csv, .json)
 1. Use the Read tool to read the file content directly
 2. Summarize what is relevant to trading strategy development
-3. Ask the user: "Is this understanding correct? Anything to add or correct?"
+3. Use AskUserQuestion with header "Context", question "Is this understanding correct?", options: "Yes, correct" (confirm and continue), "Not quite" (user explains correction via Other).
 4. Wait for the user's response
 
 After each file is confirmed (or corrected), record:
@@ -411,7 +411,7 @@ Fixed Parameters:
   ...
 ```
 
-2. Ask: "Does everything look correct? Say 'yes' to save, or tell me what to change."
+2. Use AskUserQuestion with header "Confirm", question "Does this look correct?", options: "Yes, save it" (proceed to write artifact), "Change something" (ask what to change). If user picks Other with a comment, treat as change request.
 
 3. If the user requests changes:
    - Go back to the relevant topic
@@ -419,7 +419,6 @@ Fixed Parameters:
    - Re-display the full summary
    - Ask for confirmation again
 
-4. Do NOT proceed to Step 4 until the user confirms. The word "yes", "looks good", "correct", "save it", or similar affirmative is required.
 
 ---
 

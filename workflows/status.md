@@ -30,7 +30,7 @@ This workflow is READ-ONLY -- it does not modify any files.
      - **PDF files**: Use the Read tool with `pages` parameter (e.g., pages "1-5" for large PDFs).
      - **Text files** (.txt, .md, .csv): Read content directly.
    - Describe what you see and how it relates to the trading strategy.
-   - Ask user: "Is this understanding correct? Anything to add or correct?"
+   - Use AskUserQuestion with header "Context", question "Is this understanding correct?", options: "Yes, correct" (confirm and continue), "Not quite" (user explains correction via Other).
    - **Important:** Since the status command has no Write permission, you cannot update STATE.md.
      Inform the user: "New context file detected: {filename}. Context will be processed on your next /brrr: command that modifies state."
 6. If more than 5 new files exist, note: "{N} more context files detected -- they will be shown on subsequent commands."

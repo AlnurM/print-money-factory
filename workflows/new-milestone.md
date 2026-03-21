@@ -80,19 +80,19 @@ For each new file (up to 5), process based on type:
 1. Use the Read tool to view the image file -- you will see it visually
 2. Describe in detail what you see: chart patterns, indicators, annotations, timeframe, asset, any visible text or labels
 3. State your interpretation of how this image relates to a trading strategy
-4. Ask the user: "Is this understanding correct? Anything to add or correct?"
+4. Use AskUserQuestion with header "Context", question "Is this understanding correct?", options: "Yes, correct" (confirm and continue), "Not quite" (user explains correction via Other).
 5. Wait for the user's response before moving to the next file
 
 ### PDF files
 1. Use the Read tool with the `pages` parameter to read the PDF (start with pages "1-5")
 2. Summarize the content that is relevant to trading strategy development
-3. Ask the user: "Is this understanding correct? Anything to add or correct?"
+3. Use AskUserQuestion with header "Context", question "Is this understanding correct?", options: "Yes, correct" (confirm and continue), "Not quite" (user explains correction via Other).
 4. Wait for the user's response
 
 ### Text files (.txt, .md, .csv, .json)
 1. Use the Read tool to read the file content directly
 2. Summarize what is relevant to trading strategy development
-3. Ask the user: "Is this understanding correct? Anything to add or correct?"
+3. Use AskUserQuestion with header "Context", question "Is this understanding correct?", options: "Yes, correct" (confirm and continue), "Not quite" (user explains correction via Other).
 4. Wait for the user's response
 
 After each file is confirmed (or corrected), record:
@@ -261,7 +261,7 @@ Success Criteria:
 Context files processed: {count or "none"}
 ```
 
-2. Ask the user: "Does everything look correct? Say 'yes' to create the milestone, or tell me what to change."
+2. Use AskUserQuestion with header "Confirm", question "Does this look correct?", options: "Yes, create milestone" (proceed to file creation), "Change something" (ask what to change). If user selects "Change something" or picks Other with a comment, go back to the relevant step.
 3. If the user requests changes, go back to the relevant step (Step 2 for idea changes, Step 3 for scope, Step 5 for data, Step 6 for criteria)
 4. Once confirmed, proceed to file creation
 

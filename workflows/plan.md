@@ -414,7 +414,7 @@ Budget: {OK / WARNING: reason}
 ========================================
 ```
 
-Ask: "Does the plan look correct? Say 'yes' to save, or tell me what to change."
+Use AskUserQuestion with header "Confirm", question "Does this plan look correct?", options: "Yes, save it" (proceed to write artifact), "Change something" (ask what to change). If user picks Other with a comment, treat as change request.
 
 If the user requests changes:
 - Identify which step the change belongs to (Step 2 for parameters, Step 3 for budget, Step 4 for method, Step 5 for criteria, Step 6 for data)
