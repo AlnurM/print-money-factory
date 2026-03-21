@@ -97,10 +97,12 @@ Plans:
   3. User runs `/brrr:verify --approved` and gets an `output/` directory containing valid PineScript v5, trading-rules.md, performance-report.md, backtest_final.py, live-checklist.md, and the HTML report
   4. User runs `/brrr:verify --debug` and the system diagnoses what went wrong, opens a new phase cycle, and the next `/brrr:discuss` starts from the AI diagnosis rather than from scratch
   5. The PineScript export is a valid TradingView strategy that can be pasted directly into the Pine Editor
-**Plans:** TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD -- planned during Phase 5 planning
+- [ ] 05-01-PLAN.md -- HTML report template extension + Python report generator (all 9 sections, regime/benchmark analytics)
+- [ ] 05-02-PLAN.md -- Verify workflow + PineScript syntax reference (AI analysis, approval/debug flow, export package)
+- [ ] 05-03-PLAN.md -- Install script update + end-to-end human verification
 
 ## Progress
 
@@ -113,4 +115,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Milestone Lifecycle & State | 2/2 | Complete | - |
 | 3. Strategy Specification | 3/3 | Complete | - |
 | 4. AI Backtest Loop | 2/2 | Complete   | 2026-03-21 |
-| 5. Verify & Export | 0/TBD | Not started | - |
+| 5. Verify & Export | 0/3 | Not started | - |
