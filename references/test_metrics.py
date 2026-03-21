@@ -25,9 +25,12 @@ from metrics import (
 
 class TestSharpeRatio:
     def test_known_answer_alternating(self, sample_returns):
-        """252 days of +1%/-0.5% -> Sharpe between 3.5 and 4.0."""
+        """252 days of +1%/-0.5% -> Sharpe approx 5.28.
+
+        mean(excess) = 0.0025, std(excess, ddof=1) ~ 0.00751, * sqrt(252) ~ 5.28
+        """
         result = sharpe_ratio(sample_returns)
-        assert 3.5 <= result <= 4.0, f"Sharpe {result} not in [3.5, 4.0]"
+        assert 5.0 <= result <= 5.6, f"Sharpe {result} not in [5.0, 5.6]"
 
     def test_constant_returns_nan(self):
         """Constant returns (zero std) -> NaN."""
