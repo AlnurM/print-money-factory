@@ -17,6 +17,9 @@ The iterative backtest loop must work end-to-end: a user describes a strategy id
 - ✓ `/brrr:new-milestone` — guided scoping flow with context file scanning, smart scope defaults, strategy-type criteria — Phase 2
 - ✓ `/brrr:status` — ASCII tree with step icons, best metrics, next step recommendation — Phase 2
 - ✓ STATE.md tracks milestone status, all phases, best metrics per phase — Phase 2
+- ✓ `/brrr:discuss` — guided conversation for strategy decisions, --auto mode, debug discuss with full context, drift detection hard gate — Phase 3
+- ✓ `/brrr:research` — find implementations, pitfalls, lookahead traps. --deep mode. Auto-recommendation — Phase 3
+- ✓ `/brrr:plan` — parameter space, optimization method auto-select, train/test split, parameter budget enforcement — Phase 3
 
 ### Active
 - [ ] `/brrr:new-milestone` — scoping flow: parse context files, collect strategy idea, define scope (strategy/backtest/tuning/exports), set success criteria, output STRATEGY.md and STATE.md
@@ -89,4 +92,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-21 after Phase 2 completion*
+*Last updated: 2026-03-21 after Phase 3 completion*
