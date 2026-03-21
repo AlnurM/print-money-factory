@@ -14,6 +14,9 @@ The iterative backtest loop must work end-to-end: a user describes a strategy id
 
 - ✓ Install via `npx print-money-factory install` — copies commands to `~/.claude/commands/brrr/`, creates Python venv with all backtest dependencies — Phase 1
 - ✓ Package architecture mirrors GSD: commands/, workflows/, templates/, references/ with fixed metrics module and reference backtest patterns — Phase 1
+- ✓ `/brrr:new-milestone` — guided scoping flow with context file scanning, smart scope defaults, strategy-type criteria — Phase 2
+- ✓ `/brrr:status` — ASCII tree with step icons, best metrics, next step recommendation — Phase 2
+- ✓ STATE.md tracks milestone status, all phases, best metrics per phase — Phase 2
 
 ### Active
 - [ ] `/brrr:new-milestone` — scoping flow: parse context files, collect strategy idea, define scope (strategy/backtest/tuning/exports), set success criteria, output STRATEGY.md and STATE.md
@@ -86,4 +89,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-21 after Phase 1 completion*
+*Last updated: 2026-03-21 after Phase 2 completion*
