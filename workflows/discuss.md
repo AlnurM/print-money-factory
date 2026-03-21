@@ -4,6 +4,38 @@ Collect all strategy decisions through guided conversation before any code is wr
 
 Follow these sections in order, top to bottom. Each section contains behavioral instructions -- read them, then execute them using your tools (Read, Write, Bash, Glob). Do NOT skip sections unless explicitly told to.
 
+## CRITICAL: Interaction Rules
+
+**ONE question at a time.** This is a conversation, not a questionnaire.
+
+- Ask ONE question, wait for the user's response, then ask the next
+- NEVER present multiple topics or questions in a single message
+- NEVER dump a checklist of decisions for the user to fill in
+- Use short, focused messages -- 2-4 sentences max per turn
+- After each user response, acknowledge briefly ("Got it"), then ask the next question
+- Follow the thread -- if the user's answer opens an interesting direction, explore it before moving on
+- The 7 decision topics (entry/exit, stops, sizing, etc.) should be covered naturally through conversation, not as a numbered list
+
+**Example of WRONG approach:**
+```
+Let's collect your strategy decisions:
+1. Entry logic: ...
+2. Exit logic: ...
+3. Stop loss: ...
+4. Position sizing: ...
+Please describe each.
+```
+
+**Example of RIGHT approach:**
+```
+Tell me about the entry signal -- what tells you to get into a trade?
+```
+(wait for response)
+```
+Makes sense -- a close above the order block. And how do you exit? Fixed target, or trailing?
+```
+(wait for response)
+
 ---
 
 ## Preamble: Sequence Validation

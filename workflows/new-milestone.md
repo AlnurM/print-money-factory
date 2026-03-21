@@ -4,6 +4,39 @@ Create a new trading strategy milestone through guided conversation.
 
 Follow these sections in order, top to bottom. Each section contains behavioral instructions -- read them, then execute them using your tools (Read, Write, Bash, Glob). Do NOT skip sections unless explicitly told to.
 
+## CRITICAL: Interaction Rules
+
+**ONE question at a time.** This is a conversation, not a form.
+
+- Ask ONE question, wait for the user's response, then ask the next
+- NEVER present multiple steps or questions in a single message
+- NEVER dump a list of questions for the user to answer all at once
+- Use short, focused messages -- 2-4 sentences max per turn
+- After each user response, acknowledge it briefly, then move to the next question
+- The user should feel like they're chatting, not filling out a form
+
+**Example of WRONG approach:**
+```
+Here are the questions:
+1. What's your strategy?
+2. What asset?
+3. What timeframe?
+4. What targets?
+```
+
+**Example of RIGHT approach:**
+```
+What trading strategy are you thinking about? Describe the core idea.
+```
+(wait for response)
+```
+Got it -- SMC with RSI filter. What asset are you trading? Crypto, stocks, or forex?
+```
+(wait for response)
+```
+BTC/USDT -- which exchange? Binance is the default for best data fidelity.
+```
+
 ---
 
 ## Preamble: Active Milestone Check
