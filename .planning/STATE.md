@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-03-21T14:50:02.134Z"
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-03-21T14:50:31.956Z"
 progress:
   total_phases: 5
   completed_phases: 3
@@ -54,6 +54,8 @@ Plan: 3 of 3
 | Phase 02 P02 | 1min | 1 tasks | 1 files |
 | Phase 02 P01 | 3min | 2 tasks | 3 files |
 | Phase 03 P02 | 2min | 1 tasks | 1 files |
+| Phase 03 P01 | 3min | 1 tasks | 1 files |
+| Phase 03 P03 | 3min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -73,6 +75,10 @@ Recent decisions affecting current work:
 - [Phase 02]: Used text icons [DONE]/[WIP]/[SKIP]/[    ] for reliable terminal rendering in status tree
 - [Phase 02]: Embedded preamble in workflow rather than separate _preamble.md file for simpler sequential execution
 - [Phase 03]: Research workflow follows new-milestone.md structural pattern; recommendation is informational only; standard mode skips web search if training data sufficient
+- [Phase 03]: Follow-the-thread conversation style for discuss, not fixed questionnaire
+- [Phase 03]: Drift detection uses >50% change threshold as hard gate with binary choice
+- [Phase 03]: Plan workflow warns about overfitting but allows user override per D-13
+- [Phase 03]: Plan defines percentages/rules, execute calculates exact dates per D-14
 
 ### Pending Todos
 
@@ -86,6 +92,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-21T14:49:57.580Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-03-21T14:50:31.953Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None

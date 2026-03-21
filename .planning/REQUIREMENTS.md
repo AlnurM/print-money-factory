@@ -29,12 +29,12 @@
 
 ### Discuss Phase
 
-- [ ] **DISC-01**: `/brrr:discuss` collects all strategy decisions: entry/exit logic, stops, take-profit, position sizing, commission assumptions, parameter ranges
-- [ ] **DISC-02**: First discuss builds strategy spec from scratch via guided conversation
-- [ ] **DISC-03**: Debug discuss starts from previous verify diagnosis -- AI reads full milestone context and formulates starting hypothesis
-- [ ] **DISC-04**: Hypothesis drift protection -- detects when user changes exceed original strategy scope, offers new milestone
-- [ ] **DISC-05**: `--auto` flag lets Claude choose reasonable defaults with minimal questions
-- [ ] **DISC-06**: Outputs `phase_N_discuss.md` with all decisions fixed
+- [x] **DISC-01**: `/brrr:discuss` collects all strategy decisions: entry/exit logic, stops, take-profit, position sizing, commission assumptions, parameter ranges
+- [x] **DISC-02**: First discuss builds strategy spec from scratch via guided conversation
+- [x] **DISC-03**: Debug discuss starts from previous verify diagnosis -- AI reads full milestone context and formulates starting hypothesis
+- [x] **DISC-04**: Hypothesis drift protection -- detects when user changes exceed original strategy scope, offers new milestone
+- [x] **DISC-05**: `--auto` flag lets Claude choose reasonable defaults with minimal questions
+- [x] **DISC-06**: Outputs `phase_N_discuss.md` with all decisions fixed
 
 ### Research Phase
 
@@ -176,12 +176,12 @@
 | CTXT-01 | Phase 2 | Complete |
 | CTXT-02 | Phase 2 | Complete |
 | CTXT-03 | Phase 2 | Complete |
-| DISC-01 | Phase 3 | Pending |
-| DISC-02 | Phase 3 | Pending |
-| DISC-03 | Phase 3 | Pending |
-| DISC-04 | Phase 3 | Pending |
-| DISC-05 | Phase 3 | Pending |
-| DISC-06 | Phase 3 | Pending |
+| DISC-01 | Phase 3 | Complete |
+| DISC-02 | Phase 3 | Complete |
+| DISC-03 | Phase 3 | Complete |
+| DISC-04 | Phase 3 | Complete |
+| DISC-05 | Phase 3 | Complete |
+| DISC-06 | Phase 3 | Complete |
 | RSCH-01 | Phase 3 | Complete |
 | RSCH-02 | Phase 3 | Complete |
 | RSCH-03 | Phase 3 | Complete |
