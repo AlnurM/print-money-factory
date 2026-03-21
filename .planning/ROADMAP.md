@@ -101,7 +101,7 @@ Plans:
 
 Plans:
 - [x] 05-01-PLAN.md -- HTML report template extension + Python report generator (all 9 sections, regime/benchmark analytics)
-- [ ] 05-02-PLAN.md -- Verify workflow + PineScript syntax reference (AI analysis, approval/debug flow, export package)
+- [x] 05-02-PLAN.md -- Verify workflow + PineScript syntax reference (AI analysis, approval/debug flow, export package)
 - [ ] 05-03-PLAN.md -- Install script update + end-to-end human verification
 
 ## Progress

@@ -83,19 +83,19 @@
 - [x] **VRFY-07**: Report includes regime breakdown -- performance in bull/bear/sideways
 - [x] **VRFY-08**: Report includes benchmark correlation -- alpha, beta vs buy-and-hold
 - [x] **VRFY-09**: Report includes metrics summary table -- all metrics vs targets
-- [ ] **VRFY-10**: AI analyzes full report and formulates conclusion with specific assessment
-- [ ] **VRFY-11**: `--approved` closes milestone, triggers export package generation
-- [ ] **VRFY-12**: `--debug` keeps milestone open, AI diagnoses failure, opens new phase cycle with diagnosis as starting point
+- [x] **VRFY-10**: AI analyzes full report and formulates conclusion with specific assessment
+- [x] **VRFY-11**: `--approved` closes milestone, triggers export package generation
+- [x] **VRFY-12**: `--debug` keeps milestone open, AI diagnoses failure, opens new phase cycle with diagnosis as starting point
 
 ### Export (on --approved)
 
-- [ ] **EXPT-01**: PineScript v5 code -- valid, runnable TradingView strategy
-- [ ] **EXPT-02**: `trading-rules.md` -- plain English entry/exit/sizing rules
-- [ ] **EXPT-03**: `performance-report.md` -- portable metrics summary for sharing
-- [ ] **EXPT-04**: `backtest_final.py` -- reproducible Python script, runs standalone
-- [ ] **EXPT-05**: `live-checklist.md` -- step-by-step guide before real money
-- [ ] **EXPT-06**: `report_vN.html` -- copy of the final interactive HTML report
-- [ ] **EXPT-07**: All exports in `output/` directory
+- [x] **EXPT-01**: PineScript v5 code -- valid, runnable TradingView strategy
+- [x] **EXPT-02**: `trading-rules.md` -- plain English entry/exit/sizing rules
+- [x] **EXPT-03**: `performance-report.md` -- portable metrics summary for sharing
+- [x] **EXPT-04**: `backtest_final.py` -- reproducible Python script, runs standalone
+- [x] **EXPT-05**: `live-checklist.md` -- step-by-step guide before real money
+- [x] **EXPT-06**: `report_vN.html` -- copy of the final interactive HTML report
+- [x] **EXPT-07**: All exports in `output/` directory
 
 ### State Management
 
@@ -218,16 +218,16 @@
 | VRFY-07 | Phase 5 | Complete |
 | VRFY-08 | Phase 5 | Complete |
 | VRFY-09 | Phase 5 | Complete |
-| VRFY-10 | Phase 5 | Pending |
-| VRFY-11 | Phase 5 | Pending |
-| VRFY-12 | Phase 5 | Pending |
-| EXPT-01 | Phase 5 | Pending |
-| EXPT-02 | Phase 5 | Pending |
-| EXPT-03 | Phase 5 | Pending |
-| EXPT-04 | Phase 5 | Pending |
-| EXPT-05 | Phase 5 | Pending |
-| EXPT-06 | Phase 5 | Pending |
-| EXPT-07 | Phase 5 | Pending |
+| VRFY-10 | Phase 5 | Complete |
+| VRFY-11 | Phase 5 | Complete |
+| VRFY-12 | Phase 5 | Complete |
+| EXPT-01 | Phase 5 | Complete |
+| EXPT-02 | Phase 5 | Complete |
+| EXPT-03 | Phase 5 | Complete |
+| EXPT-04 | Phase 5 | Complete |
+| EXPT-05 | Phase 5 | Complete |
+| EXPT-06 | Phase 5 | Complete |
+| EXPT-07 | Phase 5 | Complete |
 | STAT-01 | Phase 2 | Complete |
 | STAT-02 | Phase 2 | Complete |
 | STAT-03 | Phase 2 | Complete |
