@@ -3,6 +3,11 @@
 ## Hypothesis
 {{One-sentence strategy thesis}}
 
+## Strategy Type
+{{strategy_type}}
+<!-- One of: trend-following, mean-reversion, breakout, custom -->
+<!-- Drives default success criteria values -->
+
 ## Asset & Timeframe
 - **Asset:** {{asset}}
 - **Exchange/Source:** {{data source}}
@@ -15,8 +20,9 @@
 - [ ] Strategy logic (entry/exit rules)
 - [ ] Backtesting & optimization
 - [ ] Parameter tuning
+- [ ] Risk management
 - [ ] PineScript export
-- [ ] Performance report
+- [ ] MD instructions export
 
 ## Success Criteria
 - **Primary:** Sharpe Ratio > {{target}}
