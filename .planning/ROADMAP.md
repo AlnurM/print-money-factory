@@ -52,7 +52,7 @@ Plans:
 
 Plans:
 - [ ] 02-01-PLAN.md -- new-milestone workflow + template updates (guided scoping, context scan, state management)
-- [ ] 02-02-PLAN.md -- status workflow (ASCII tree display, best metrics, next step)
+- [x] 02-02-PLAN.md -- status workflow (ASCII tree display, best metrics, next step)
 
 ### Phase 3: Strategy Specification
 **Goal**: User can go from a vague trading idea to a complete, formal backtest specification through guided conversation, optional research, and structured planning

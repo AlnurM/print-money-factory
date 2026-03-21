@@ -19,7 +19,7 @@
 - [ ] **MILE-02**: Scope selection includes: strategy, backtest, tuning, risk management, PineScript export, MD instructions export
 - [ ] **MILE-03**: System recommends scope splitting when selection is too large
 - [ ] **MILE-04**: One active milestone at a time -- new milestone only after current is approved
-- [ ] **MILE-05**: `/brrr:status` shows ASCII tree of milestone progress, all phases, next step
+- [x] **MILE-05**: `/brrr:status` shows ASCII tree of milestone progress, all phases, next step
 
 ### Context Files
 
@@ -100,7 +100,7 @@
 ### State Management
 
 - [ ] **STAT-01**: STATE.md tracks current milestone, status, all phases with step completion
-- [ ] **STAT-02**: STATE.md records best metrics per phase (Sharpe, DD, trades)
+- [x] **STAT-02**: STATE.md records best metrics per phase (Sharpe, DD, trades)
 - [ ] **STAT-03**: Commands validate sequence -- cannot run execute without plan, verify without execute
 - [ ] **STAT-04**: STRATEGY.md captures original hypothesis and scope from new-milestone
 - [ ] **STAT-05**: Phase artifacts are append-only -- history never overwritten
@@ -172,7 +172,7 @@
 | MILE-02 | Phase 2 | Pending |
 | MILE-03 | Phase 2 | Pending |
 | MILE-04 | Phase 2 | Pending |
-| MILE-05 | Phase 2 | Pending |
+| MILE-05 | Phase 2 | Complete |
 | CTXT-01 | Phase 2 | Pending |
 | CTXT-02 | Phase 2 | Pending |
 | CTXT-03 | Phase 2 | Pending |
@@ -229,7 +229,7 @@
 | EXPT-06 | Phase 5 | Pending |
 | EXPT-07 | Phase 5 | Pending |
 | STAT-01 | Phase 2 | Pending |
-| STAT-02 | Phase 2 | Pending |
+| STAT-02 | Phase 2 | Complete |
 | STAT-03 | Phase 2 | Pending |
 | STAT-04 | Phase 2 | Pending |
 | STAT-05 | Phase 2 | Pending |
