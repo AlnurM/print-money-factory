@@ -5,3 +5,6 @@
 node_modules/
 CLAUDE.md
 PROJECT.md
+__pycache__/
+.pytest_cache/
+tests/
