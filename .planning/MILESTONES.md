@@ -1,5 +1,22 @@
 # Milestones
 
+## v1.1 Enhancement (Shipped: 2026-03-22)
+
+**Phases completed:** 5 phases, 9 plans, 13 tasks
+
+**Key accomplishments:**
+
+- Fixed blank equity PNGs by returning equity_curve from run_backtest() and using it directly in execute.md PNG generation with zero-trade guard
+- `/brrr:doctor` slash command with 6-category health check: Python version, venv, 10 library imports via actual `python -c import`, command/workflow/reference file integrity, and HEALTHY/NEEDS ATTENTION verdict
+- Structured diagnosis JSON artifact in verify --debug with failed_approaches, do_not_retry entries, and append-only semantics
+- Discuss workflow reads all diagnosis JSONs, presents Prior Debug Cycles failure table, and enforces do_not_retry constraints on AI suggestions
+- Optuna bridge module with Ask-and-Tell lifecycle, TPE/CMA-ES auto-selection, composite scoring, and SQLite persistence
+- Bayesian optimization added as fourth method in plan workflow Step 4 with auto-selection at >500 combinations, override prompt, and plan artifact fields
+- Bayesian Ask-and-Tell branch integrated into execute workflow with warmup/guided display, SQLite resume, and CMA-ES sampler persistence
+- Bot-building-guide.md generation step added to verify workflow with platform-specific deployment instructions for crypto (ccxt), stocks (alpaca/ib_async), and forex (oandapyV20/MT5)
+
+---
+
 ## v1.0 MVP (Shipped: 2026-03-22)
 
 **Phases completed:** 5 phases, 14 plans, 25 tasks

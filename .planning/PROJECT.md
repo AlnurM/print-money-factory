@@ -12,44 +12,33 @@ The iterative backtest loop must work end-to-end: a user describes a strategy id
 
 ### Validated
 
-- ✓ Install via `npx print-money-factory install` — copies commands to `~/.claude/commands/brrr/`, creates Python venv with all backtest dependencies — v1.0
-- ✓ Package architecture mirrors GSD: commands/, workflows/, templates/, references/ with fixed metrics module and reference backtest patterns — v1.0
-- ✓ `/brrr:new-milestone` — guided scoping flow with context file scanning, smart scope defaults, strategy-type criteria — v1.0
-- ✓ `/brrr:status` — ASCII tree with step icons, best metrics, next step recommendation — v1.0
-- ✓ STATE.md tracks milestone status, all phases, best metrics per phase — v1.0
-- ✓ `/brrr:discuss` — guided conversation for strategy decisions, --auto mode, debug discuss with full context, drift detection hard gate — v1.0
-- ✓ `/brrr:research` — find implementations, pitfalls, lookahead traps. --deep mode. Auto-recommendation — v1.0
-- ✓ `/brrr:plan` — parameter space, optimization method auto-select, train/test split, parameter budget enforcement — v1.0
-- ✓ `/brrr:execute` — AI-driven backtest loop with holistic analysis, adaptive param changes, 4 stop conditions, per-iteration artifacts — v1.0
-- ✓ Data sourcing via ccxt, yfinance, CSV with validation and caching — v1.0
-- ✓ `/brrr:verify` — interactive HTML report (plotly) with equity curve, drawdown, iteration table, parameter heatmap, trade list, regime breakdown, benchmark comparison, metrics summary — v1.0
-- ✓ Export package on `--approved`: PineScript v5 (strategy + indicator), trading-rules.md, performance-report.md, backtest_final.py, live-checklist.md, report HTML — v1.0
-- ✓ `/brrr:update` — re-install from npm to update commands and workflows — v1.0
-- ✓ Claude-generated Python backtest engine — no external backtest library — v1.0
-- ✓ Context file support — `.pmf/context/` accepts images, PDFs, screenshots — v1.0
-- ✓ Hypothesis drift protection — detect scope drift during debug, offer new milestone — v1.0
-- ✓ Per-iteration equity PNG generation during execute phase — v1.0
-- ✓ Sequence validation — commands enforce correct order — v1.0
+- ✓ Install via `npx print-money-factory install` — v1.0
+- ✓ Package architecture mirrors GSD — v1.0
+- ✓ `/brrr:new-milestone` — guided scoping flow — v1.0
+- ✓ `/brrr:status` — ASCII tree with step icons — v1.0
+- ✓ STATE.md tracks milestone status — v1.0
+- ✓ `/brrr:discuss` — guided conversation, --auto, drift detection — v1.0
+- ✓ `/brrr:research` — implementations, pitfalls, --deep mode — v1.0
+- ✓ `/brrr:plan` — parameter space, optimization method, train/test split — v1.0
+- ✓ `/brrr:execute` — AI-driven backtest loop, 4 stop conditions — v1.0
+- ✓ Data sourcing via ccxt, yfinance, CSV — v1.0
+- ✓ `/brrr:verify` — interactive HTML report (plotly), 9 sections — v1.0
+- ✓ Export package: PineScript v5, trading-rules, performance-report, backtest, live-checklist, HTML — v1.0
+- ✓ `/brrr:update` — re-install from npm — v1.0
+- ✓ Claude-generated Python backtest engine — v1.0
+- ✓ Context file support — v1.0
+- ✓ Hypothesis drift protection — v1.0
+- ✓ Sequence validation — v1.0
+- ✓ Equity PNG fix — visible curves, zero-trade guard — v1.1
+- ✓ `/brrr:doctor` — 6-category diagnostic command — v1.1
+- ✓ Auto version check preamble in all workflows — v1.1
+- ✓ Debug cycle memory — diagnosis JSON, do_not_retry enforcement — v1.1
+- ✓ Bayesian optimization — Optuna TPE/CMA-ES via Ask-and-Tell, SQLite persistence — v1.1
+- ✓ Bot-building guide — platform-specific deployment instructions on --approved — v1.1
 
 ### Active
 
-- [ ] Bayesian optimization via optuna for large parameter spaces
-- [ ] Enhanced export: MD-instruction format for bot-building guides
-- [ ] `/brrr:doctor` diagnostic command — checks Python version, venv health, dependencies
-- [ ] Auto version check on every `/brrr:*` command (silent, once per session)
-- [ ] Smarter debug cycles — AI carries forward failed approaches across iterations
-- [ ] Fix blank equity PNG generation during `/brrr:execute`
-
-## Current Milestone: v1.1 Enhancement
-
-**Goal:** Polish the existing pipeline with smarter optimization, better debug cycles, maintenance tooling, and bug fixes.
-
-**Target features:**
-- Advanced optimization (Bayesian/optuna)
-- Enhanced export (MD-instruction format)
-- Maintenance commands (/brrr:doctor, auto version check)
-- Smarter debug cycles
-- Fix equity PNG bug
+(None — next milestone requirements TBD via `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -59,16 +48,18 @@ The iterative backtest loop must work end-to-end: a user describes a strategy id
 - Mobile app — not applicable
 - User authentication — local tool, no accounts
 - Real-time market data streaming — backtesting only, no live feeds
+- Multi-objective Optuna optimization — defer to v1.2
 
 ## Context
 
-**v1.0 shipped 2026-03-22** — published as `@print-money-factory/cli@0.4.0` on npm.
+**v1.1 shipped 2026-03-22** — published as `@print-money-factory/cli@0.5.0` on npm.
 
-- 8 slash commands: new-milestone, discuss, research, plan, execute, verify, status, update
-- 7 behavioral workflows (discuss 512 lines, execute 1067 lines, verify 999 lines)
-- Python modules: metrics.py (8K), data_sources.py (11K), backtest_engine.py (9.5K), report_generator.py (29.8K)
-- 32 metrics unit tests + 14 report/export tests passing
-- Architecture mirrors GSD: commands/, workflows/, templates/, references/, bin/
+- 9 slash commands: new-milestone, discuss, research, plan, execute, verify, status, update, doctor
+- 8 behavioral workflows + version check preamble in all
+- Python modules: metrics.py, data_sources.py, backtest_engine.py, report_generator.py, optuna_bridge.py (new)
+- 32 metrics tests + 14 report/export tests + 23 optuna bridge tests = 69 tests passing
+- Bayesian optimization via Optuna Ask-and-Tell with SQLite persistence
+- Debug cycle memory with structured diagnosis JSON and do_not_retry enforcement
 
 ## Constraints
 
@@ -83,15 +74,20 @@ The iterative backtest loop must work end-to-end: a user describes a strategy id
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Claude writes backtest engine (not vectorbt/backtesting.py) | Maximum flexibility per strategy — no framework constraints | ✓ Good — enables novel strategies without framework constraints |
-| Python venv managed by install script | Zero-friction setup, isolated from user's system Python | ✓ Good — works on Python 3.10-3.14, idempotent |
-| One milestone at a time | Keeps focus, prevents strategy confusion | ✓ Good — clean lifecycle |
-| GSD-mirror architecture | Proven pattern for Claude Code command packages | ✓ Good — 8 thin commands, 7 behavioral workflows |
-| Per-iteration PNGs + final HTML | Visual feedback during optimization + polished final report | ✓ Good — matplotlib for speed, plotly for interactivity |
-| SMA slope + ADX for regime classification | Simple, no lookahead, interpretable | ✓ Good — per D-03 |
-| PineScript v5 (not v6) with migration comment | v6 too new, v5 universal in TradingView | ✓ Good — per D-18 |
-| Both strategy() and indicator() PineScript exports | Different use cases (backtesting vs live alerts) | ✓ Good — per D-17 |
-| Standalone HTML (no kaleido/Chrome dependency) | Portability — works on any machine with a browser | ✓ Good — CDN plotly.js |
+| Claude writes backtest engine (not vectorbt/backtesting.py) | Maximum flexibility per strategy | ✓ Good |
+| Python venv managed by install script | Zero-friction setup | ✓ Good |
+| One milestone at a time | Keeps focus | ✓ Good |
+| GSD-mirror architecture | Proven pattern | ✓ Good |
+| Per-iteration PNGs + final HTML | Visual feedback + polished report | ✓ Good |
+| SMA slope + ADX for regime classification | Simple, no lookahead | ✓ Good |
+| PineScript v5 with migration comment | v5 universal in TradingView | ✓ Good |
+| Both strategy() and indicator() exports | Different use cases | ✓ Good |
+| Standalone HTML (no kaleido) | Portability | ✓ Good |
+| Optuna Ask-and-Tell (not study.optimize) | Preserves per-iteration AI analysis loop | ✓ Good |
+| CMA-ES for all-continuous, TPE otherwise | CMA-ES doesn't support categorical | ✓ Good |
+| Composite score with capped penalty | Prevents drawdown domination | ✓ Good |
+| Diagnosis JSON (not just markdown) | Machine-readable for discuss workflow | ✓ Good |
+| ib_async (not ib_insync) in bot guide | ib_insync is archived | ✓ Good |
 
 ## Evolution
 
@@ -111,4 +107,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-22 after v1.1 milestone started*
+*Last updated: 2026-03-22 after v1.1 milestone completion*

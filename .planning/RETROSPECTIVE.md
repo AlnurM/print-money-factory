@@ -43,6 +43,45 @@
 
 ---
 
+## Milestone: v1.1 — Enhancement
+
+**Shipped:** 2026-03-22
+**Phases:** 5 | **Plans:** 9 | **Sessions:** ~2
+
+### What Was Built
+- Fixed blank equity PNGs (3-line fix in backtest_engine.py + execute.md template update)
+- `/brrr:doctor` diagnostic with 6-check categories and pass/fail verdicts
+- Version check preamble in all 7 workflows (24h cache, silent on failure)
+- Debug cycle memory: structured diagnosis JSON, do_not_retry enforcement, 50-entry cap with merge
+- Bayesian optimization: optuna_bridge.py (10 functions, 23 tests), Ask-and-Tell loop, TPE/CMA-ES auto-selection, SQLite persistence
+- Bot-building guide with platform-specific deployment instructions (crypto/stocks/forex)
+
+### What Worked
+- TDD for optuna_bridge.py — 23 tests written first, all green on implementation. Caught CMA-ES categorical limitation early.
+- Plan-check-revise loop caught real issues: npm package name wrong in version check (07-02), missing VALIDATION.md (09)
+- Parallel execution in waves worked perfectly — 07-01 + 07-02 and 09-01 + 09-02 ran concurrently with no conflicts
+
+### What Was Inefficient
+- Research was requested for phases where it wasn't strictly needed (Phase 10 is purely additive content, research added little)
+- ROADMAP.md phase completion checkboxes got out of sync with actual phase status — `phase complete` tool didn't update all checkboxes
+
+### Patterns Established
+- optuna_bridge.py as a separate reference module (not inline in workflow) — enables unit testing
+- Diagnosis JSON as machine-readable artifact (vs markdown-only debug_diagnosis.md)
+- Version check via npm view with timestamp-file gating
+
+### Key Lessons
+1. The plan-checker saves real debugging time — catching wrong package names or missing artifacts before execution is worth the 1-2 minutes
+2. Bug fixes should always be Phase 1 of a milestone — they unblock everything and build confidence
+3. Research is valuable for complex integrations (Optuna) but overkill for simple additive content (bot-building guide)
+
+### Cost Observations
+- Model mix: ~75% opus (planning, execution), ~25% sonnet (verification, checking)
+- Sessions: ~2 across 1 day
+- Notable: v1.1 completed same day as v1.0 — 5 phases in ~4 hours
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -50,14 +89,18 @@
 | Milestone | Sessions | Phases | Key Change |
 |-----------|----------|--------|------------|
 | v1.0 | ~4 | 5 | Initial pipeline — established behavioral workflow pattern |
+| v1.1 | ~2 | 5 | Enhancement — TDD for modules, parallel wave execution |
 
 ### Cumulative Quality
 
 | Milestone | Tests | Coverage | Zero-Dep Additions |
 |-----------|-------|----------|-------------------|
 | v1.0 | 46 (32 metrics + 14 report/export) | Core metrics + report generation | 0 (all deps in requirements.txt) |
+| v1.1 | 69 (+23 optuna bridge) | Core + report + optuna | 0 (optuna already in requirements.txt) |
 
 ### Top Lessons (Verified Across Milestones)
 
-1. Behavioral workflows > code templates for AI-driven tools
-2. Human checkpoints catch what automated checks miss
+1. Behavioral workflows > code templates for AI-driven tools (v1.0, v1.1)
+2. Human checkpoints catch what automated checks miss (v1.0)
+3. Plan-checker catches real bugs before execution — worth the overhead (v1.0, v1.1)
+4. TDD for reference modules pays off — catches edge cases early (v1.0 metrics, v1.1 optuna bridge)
