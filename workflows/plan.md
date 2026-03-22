@@ -256,9 +256,10 @@ Auto-select the optimization method based on parameter count and total combinati
 
 ### Auto-Selection Rules
 
-- **Total combinations < 1000:** Grid search (exhaustive) -- tests every single combination. Feasible and gives the most complete picture.
-- **Total combinations 1000-10000:** Random search -- samples N iterations (default: 50) from the parameter space. Covers the space efficiently without testing everything.
-- **3+ free parameters OR total combinations > 10000:** Walk-forward optimization -- rolling train/test windows. Recommended for robustness and best defense against overfitting.
+- **Total combinations <= 100:** Grid search (exhaustive) -- tests every single combination.
+- **Total combinations 101-500:** Random search -- samples N iterations (default: 50).
+- **Total combinations > 500:** Bayesian optimization (Optuna TPE/CMA-ES) -- uses probability model to suggest promising parameter combinations. Far more efficient than random for large spaces.
+- **Walk-forward:** Available as user override for any parameter space size. Best for robustness testing with rolling train/test windows.
 
 ### Display and Override
 
@@ -266,14 +267,23 @@ Present the auto-selection with reasoning:
 
 ```
 --- Optimization Method ---
-Method: {grid_search / random_search / walk_forward}
+Method: {grid_search / random_search / bayesian / walk_forward}
 Reason: {why this was selected, referencing the rules above}
 
 {If random_search: "Max iterations: 50 (adjustable)"}
+{If bayesian: "Sampler: auto (TPE or CMA-ES selected at execute time based on parameter types)"}
 {If walk_forward: "Train window and test window will be configured in Step 6"}
 
-Override? (grid / random / walk-forward / keep)
+Override? (grid / random / walk-forward / bayesian / keep)
 ```
+
+**When bayesian is selected (per D-07):**
+Record these additional fields in the plan artifact:
+- `optimization_method: bayesian`
+- `sampler: auto` (sampler auto-selects TPE vs CMA-ES at execute time based on parameter types -- per D-10)
+- `min_iterations: 20` (bayesian needs at least 2x warmup trials to be effective; warmup is 10 random trials)
+
+**Important:** If the user sets `--iterations` below 20 with bayesian method, warn: "Bayesian optimization needs at least 20 iterations (10 warmup + 10 guided). With fewer iterations, random search would be equally effective. Continue anyway? (yes / switch to random)"
 
 If the user overrides:
 - Accept their choice
@@ -419,8 +429,9 @@ Display the complete optimization plan in one consolidated view for final review
 {list of all constraints}
 
 ## Optimization
-Method: {grid_search / random_search / walk_forward}
+Method: {grid_search / random_search / bayesian / walk_forward}
 {If random: Max iterations: {N}}
+{If bayesian: Sampler: auto, Min iterations: 20}
 {If walk-forward: Train {N} bars, Test {M} bars, Step {S} bars}
 
 ## Evaluation
@@ -476,9 +487,12 @@ Write `.pmf/phases/phase_N_plan.md` with this structure:
 - {constraint description}
 
 ## Optimization Method
-- **Method:** {grid_search | random_search | walk_forward}
+- **Method:** {grid_search | random_search | bayesian | walk_forward}
 - **Reason:** {auto-selected because X | user override: selected Y instead of Z}
 - **Max iterations:** {N}
+{If bayesian:}
+- **Sampler:** auto (TPE or CMA-ES selected at execute time)
+- **Min iterations:** 20
 
 {If walk-forward:}
 ### Walk-Forward Configuration
