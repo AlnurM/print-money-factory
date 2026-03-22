@@ -892,7 +892,93 @@ Rules for diagnosis:
 - Reference the data: "Based on the regime table, sideways trades had a 30% win rate vs 65% in bull."
 - If the strategy is fundamentally flawed, say so: "Consider switching to a mean-reversion approach instead."
 
-### 5b.2: Update STATE.md for New Phase Cycle
+### 5b.2: Write Diagnosis JSON (DBUG-01)
+
+After writing the human-readable diagnosis, write a machine-readable `phase_N_diagnosis.json` that captures failed approaches and explicit "do NOT retry" entries. This structured artifact is consumed by `/brrr:discuss` in debug mode to prevent retrying failed parameter regions.
+
+1. **Check for existing diagnosis file**: Use the Read tool to check if `.pmf/phases/phase_N_diagnosis.json` exists (where N is the current phase number).
+   - If it exists, parse the JSON and extract the existing `failed_approaches` array.
+   - If it does not exist (first debug cycle for this phase), start with an empty `failed_approaches` array.
+
+2. **Build a new `failed_approaches` entry** from the iteration data already loaded in 5b.1 (iteration verdicts, metrics, params, best_result). The entry MUST contain:
+
+   - `iteration_range`: string like `"1-10"` covering the iterations in this phase cycle
+   - `params_tried`: object mapping each parameter name to the array of distinct values tried across iterations (e.g., `{"fast_period": [5, 10, 15, 20], "slow_period": [20, 30, 50]}`)
+   - `best_result`: object with the best metrics achieved in this cycle (e.g., `{"sharpe": 0.8, "max_dd": -0.15, "trades": 45, "win_rate": 0.52}`)
+   - `diagnosis`: string -- 1-2 sentence AI diagnosis of why this approach failed (same analysis as debug_diagnosis.md but condensed to one key finding)
+   - `do_not_retry`: array of strings -- explicit parameter regions or approaches that should NOT be retried. Formulate these from the iteration data by identifying which parameter regions consistently underperformed. Examples:
+     - `"fast_period < 10 with slow_period < 30"`
+     - `"stop_loss < 1.5%"`
+     - `"mean-reversion without volume filter"`
+     - `"RSI overbought threshold > 80 (insufficient entries)"`
+
+   The `diagnosis` and `do_not_retry` fields are AI-generated analysis, NOT mechanical dumps of data. Analyze which parameter combinations failed and WHY, then formulate actionable exclusion rules.
+
+3. **Append** the new entry to the `failed_approaches` array (existing entries from prior debug cycles on this phase are preserved).
+
+4. **Assemble the full JSON object** with this structure:
+
+```json
+{
+  "phase": N,
+  "timestamp": "2026-03-22T14:30:00Z",
+  "strategy_type": "from STRATEGY.md strategy type field",
+  "best_metrics": {
+    "sharpe": 0.8,
+    "max_dd": -0.15,
+    "win_rate": 0.52,
+    "profit_factor": 1.1,
+    "total_trades": 45
+  },
+  "targets": {
+    "sharpe": 1.5,
+    "max_dd": -0.10,
+    "win_rate": 0.55
+  },
+  "failed_approaches": [
+    {
+      "iteration_range": "1-10",
+      "params_tried": {
+        "fast_period": [5, 10, 15, 20],
+        "slow_period": [20, 30, 50]
+      },
+      "best_result": {
+        "sharpe": 0.8,
+        "max_dd": -0.15,
+        "trades": 45,
+        "win_rate": 0.52
+      },
+      "diagnosis": "Entries too frequent in sideways markets, stops too tight for volatility",
+      "do_not_retry": [
+        "fast_period < 10 with slow_period < 30",
+        "stop_loss < 1.5%"
+      ]
+    }
+  ],
+  "overall_diagnosis": "AI synthesis of ALL failed approaches so far -- what has been tried, what the cumulative evidence suggests",
+  "suggested_changes": [
+    "Specific actionable change 1",
+    "Specific actionable change 2"
+  ]
+}
+```
+
+   - `phase`, `strategy_type`, and `targets` stay the same if the file already existed.
+   - `timestamp`, `best_metrics`, `overall_diagnosis`, and `suggested_changes` are updated to reflect the latest cycle.
+   - `best_metrics` reflects the best result from the LATEST cycle (not all-time best).
+   - `overall_diagnosis` synthesizes ALL `failed_approaches` entries (not just the latest).
+
+5. **Write** the JSON to `.pmf/phases/phase_N_diagnosis.json` using the Write tool.
+
+6. **Display** confirmation:
+
+```
+Diagnosis artifact written: .pmf/phases/phase_N_diagnosis.json ({M} failed approaches recorded)
+```
+
+Where `{M}` is the total number of entries in the `failed_approaches` array.
+
+### 5b.3: Update STATE.md for New Phase Cycle
 
 Read `.pmf/STATE.md` and update it for the new phase cycle:
 
@@ -920,19 +1006,21 @@ Read `.pmf/STATE.md` and update it for the new phase cycle:
 6. Update Current Phase to N+1
 7. Update Last Updated timestamp
 
-### 5b.3: Display Debug Output
+### 5b.4: Display Debug Output
 
 ```
 Debug Diagnosis for Phase {N}:
 
 {Brief summary of the diagnosis -- 2-3 sentences covering the main finding and hypothesis}
 
-Full diagnosis saved to: .pmf/phases/phase_{N}_verify/debug_diagnosis.md
+Diagnosis saved to:
+  .pmf/phases/phase_{N}_verify/debug_diagnosis.md (human-readable)
+  .pmf/phases/phase_{N}_diagnosis.json (structured, {M} failed approaches)
 
 New phase cycle opened. Run /brrr:discuss to start from the diagnosis.
 ```
 
-Proceed to Step 7 (skip Step 6 -- STATE.md already updated in 5b.2).
+Proceed to Step 7 (skip Step 6 -- STATE.md already updated in 5b.3).
 
 ---
 
@@ -1017,7 +1105,8 @@ This workflow covers the following requirements:
 |-------------|------|-------------|
 | VRFY-10 | Step 3 | AI analyzes full report and formulates conclusion |
 | VRFY-11 | Step 5a + Step 6 | --approved closes milestone, triggers export, STATE.md set to CLOSED |
-| VRFY-12 | Step 5b | --debug creates diagnosis document, opens new phase cycle |
+| VRFY-12 | Step 5b.1 | --debug creates diagnosis document, opens new phase cycle |
+| DBUG-01 | Step 5b.2 | Structured diagnosis JSON with failed approaches and do_not_retry |
 | EXPT-01 | Step 5a.2 | PineScript v5 strategy and indicator files |
 | EXPT-02 | Step 5a.3 | trading-rules.md in practitioner tone |
 | EXPT-03 | Step 5a.4 | performance-report.md with metrics summary |
