@@ -12,35 +12,28 @@ The iterative backtest loop must work end-to-end: a user describes a strategy id
 
 ### Validated
 
-- ✓ Install via `npx print-money-factory install` — copies commands to `~/.claude/commands/brrr/`, creates Python venv with all backtest dependencies — Phase 1
-- ✓ Package architecture mirrors GSD: commands/, workflows/, templates/, references/ with fixed metrics module and reference backtest patterns — Phase 1
-- ✓ `/brrr:new-milestone` — guided scoping flow with context file scanning, smart scope defaults, strategy-type criteria — Phase 2
-- ✓ `/brrr:status` — ASCII tree with step icons, best metrics, next step recommendation — Phase 2
-- ✓ STATE.md tracks milestone status, all phases, best metrics per phase — Phase 2
-- ✓ `/brrr:discuss` — guided conversation for strategy decisions, --auto mode, debug discuss with full context, drift detection hard gate — Phase 3
-- ✓ `/brrr:research` — find implementations, pitfalls, lookahead traps. --deep mode. Auto-recommendation — Phase 3
-- ✓ `/brrr:plan` — parameter space, optimization method auto-select, train/test split, parameter budget enforcement — Phase 3
-- ✓ `/brrr:execute` — AI-driven backtest loop with holistic analysis, adaptive param changes, 4 stop conditions, per-iteration artifacts — Phase 4
-- ✓ Data sourcing via ccxt, yfinance, CSV with validation and caching — Phase 4
-- ✓ `/brrr:verify` — interactive HTML report (plotly) with equity curve, drawdown, iteration table, parameter heatmap, trade list, regime breakdown, benchmark comparison, metrics summary. Accept `--approved` (close milestone, generate exports) or `--debug` (open new phase cycle with AI diagnosis) — Phase 5
-- ✓ Export package on `--approved`: PineScript v5 (strategy + indicator), trading-rules.md, performance-report.md, backtest_final.py, live-checklist.md, report HTML — Phase 5
+- ✓ Install via `npx print-money-factory install` — copies commands to `~/.claude/commands/brrr/`, creates Python venv with all backtest dependencies — v1.0
+- ✓ Package architecture mirrors GSD: commands/, workflows/, templates/, references/ with fixed metrics module and reference backtest patterns — v1.0
+- ✓ `/brrr:new-milestone` — guided scoping flow with context file scanning, smart scope defaults, strategy-type criteria — v1.0
+- ✓ `/brrr:status` — ASCII tree with step icons, best metrics, next step recommendation — v1.0
+- ✓ STATE.md tracks milestone status, all phases, best metrics per phase — v1.0
+- ✓ `/brrr:discuss` — guided conversation for strategy decisions, --auto mode, debug discuss with full context, drift detection hard gate — v1.0
+- ✓ `/brrr:research` — find implementations, pitfalls, lookahead traps. --deep mode. Auto-recommendation — v1.0
+- ✓ `/brrr:plan` — parameter space, optimization method auto-select, train/test split, parameter budget enforcement — v1.0
+- ✓ `/brrr:execute` — AI-driven backtest loop with holistic analysis, adaptive param changes, 4 stop conditions, per-iteration artifacts — v1.0
+- ✓ Data sourcing via ccxt, yfinance, CSV with validation and caching — v1.0
+- ✓ `/brrr:verify` — interactive HTML report (plotly) with equity curve, drawdown, iteration table, parameter heatmap, trade list, regime breakdown, benchmark comparison, metrics summary — v1.0
+- ✓ Export package on `--approved`: PineScript v5 (strategy + indicator), trading-rules.md, performance-report.md, backtest_final.py, live-checklist.md, report HTML — v1.0
+- ✓ `/brrr:update` — re-install from npm to update commands and workflows — v1.0
+- ✓ Claude-generated Python backtest engine — no external backtest library — v1.0
+- ✓ Context file support — `.pmf/context/` accepts images, PDFs, screenshots — v1.0
+- ✓ Hypothesis drift protection — detect scope drift during debug, offer new milestone — v1.0
+- ✓ Per-iteration equity PNG generation during execute phase — v1.0
+- ✓ Sequence validation — commands enforce correct order — v1.0
 
 ### Active
-- [ ] `/brrr:new-milestone` — scoping flow: parse context files, collect strategy idea, define scope (strategy/backtest/tuning/exports), set success criteria, output STRATEGY.md and STATE.md
-- [ ] `/brrr:discuss` — fix all strategy decisions before code: entry/exit logic, stops, position sizing, commissions, parameter ranges. Debug mode starts from previous verify diagnosis
-- [ ] `/brrr:research` — optional phase: find implementations, academic work, lookahead traps, formalization alternatives for the strategy type
-- [ ] `/brrr:plan` — design parameter space, optimization method (grid/random/walk-forward/bayesian), evaluation criteria, data period
-- [ ] `/brrr:execute` — AI-driven backtest loop: load data → run backtest → compute metrics → AI analyzes → adjust params → repeat. Stop conditions: MINT/PLATEAU/REKT/NO DATA. Per-iteration artifacts (params, metrics, equity PNG, verdict)
-- [ ] `/brrr:verify` — generate interactive HTML report (plotly): equity curve, drawdown, iteration table, parameter heatmap, trade list, regime breakdown, metrics summary. Accept `--approved` (close milestone, generate exports) or `--debug` (open new phase cycle with AI diagnosis)
-- [ ] `/brrr:status` — ASCII tree showing milestone progress, all phases, next step
-- [ ] `/brrr:update` — check GitHub for new version, show changelog, update commands and workflows
-- [ ] Claude-generated Python backtest engine — no external backtest library, Claude writes the strategy logic and backtest runner from scratch each time
-- [ ] Data sourcing via ccxt (crypto), yfinance (stocks daily, forex daily), polygon.io (stocks intraday), Dukascopy (forex intraday), with CSV fallbacks
-- [ ] Context file support — `.pmf/context/` accepts images, PDFs, screenshots; system parses and confirms understanding before incorporating
-- [ ] Export package on `--approved`: PineScript v5, trading-rules.md, performance-report.md, backtest_final.py, live-checklist.md, report HTML
-- [ ] Hypothesis protection — detect when user drifts from original idea during debug, offer to open new milestone instead
-- [ ] Per-iteration equity PNG generation during execute phase
-- [ ] STATE.md tracks milestone status, all phases, best metrics per phase
+
+(None — next milestone requirements TBD via `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -53,18 +46,20 @@ The iterative backtest loop must work end-to-end: a user describes a strategy id
 
 ## Context
 
-- Architecture mirrors GSD (get-shit-done): commands/, workflows/, templates/, references/, bin/ with tooling layer
-- Install script copies slash commands to `~/.claude/commands/brrr/` and creates a Python venv with all dependencies (pandas, numpy, ccxt, yfinance, plotly, optuna, etc.)
-- Python 3.10+ is the only user prerequisite — everything else is installed into venv
-- The backtest engine is not a fixed library — Claude writes the Python backtest code fresh for each strategy based on the plan phase decisions
-- The project document (PROJECT.md in repo root) serves as the original spec/vision document, separate from this planning artifact
+**v1.0 shipped 2026-03-22** — published as `@print-money-factory/cli@0.4.0` on npm.
+
+- 8 slash commands: new-milestone, discuss, research, plan, execute, verify, status, update
+- 7 behavioral workflows (discuss 512 lines, execute 1067 lines, verify 999 lines)
+- Python modules: metrics.py (8K), data_sources.py (11K), backtest_engine.py (9.5K), report_generator.py (29.8K)
+- 32 metrics unit tests + 14 report/export tests passing
+- Architecture mirrors GSD: commands/, workflows/, templates/, references/, bin/
 
 ## Constraints
 
 - **Distribution**: Public npm package on npmjs.com — must work via `npx print-money-factory install`
 - **Runtime**: Claude Code slash commands only — no standalone CLI, no server
 - **Python**: All backtest code runs in a managed venv, not the system Python
-- **Data**: Free data sources by default (ccxt, yfinance, Dukascopy). Paid sources (polygon.io, firstrate) optional with API keys
+- **Data**: Free data sources by default (ccxt, yfinance). Paid sources (polygon.io) optional with API keys
 - **Reports**: Standalone HTML files (plotly embedded, no server needed)
 - **Architecture**: Mirror GSD pattern — commands/, workflows/, templates/, references/ structure
 
@@ -72,28 +67,32 @@ The iterative backtest loop must work end-to-end: a user describes a strategy id
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Claude writes backtest engine (not vectorbt/backtesting.py) | Maximum flexibility per strategy — no framework constraints | — Pending |
-| Python venv managed by install script | Zero-friction setup, isolated from user's system Python | — Pending |
-| One milestone at a time | Keeps focus, prevents strategy confusion | — Pending |
-| GSD-mirror architecture | Proven pattern for Claude Code command packages | — Pending |
-| Per-iteration PNGs + final HTML | Visual feedback during optimization + polished final report | — Pending |
+| Claude writes backtest engine (not vectorbt/backtesting.py) | Maximum flexibility per strategy — no framework constraints | ✓ Good — enables novel strategies without framework constraints |
+| Python venv managed by install script | Zero-friction setup, isolated from user's system Python | ✓ Good — works on Python 3.10-3.14, idempotent |
+| One milestone at a time | Keeps focus, prevents strategy confusion | ✓ Good — clean lifecycle |
+| GSD-mirror architecture | Proven pattern for Claude Code command packages | ✓ Good — 8 thin commands, 7 behavioral workflows |
+| Per-iteration PNGs + final HTML | Visual feedback during optimization + polished final report | ✓ Good — matplotlib for speed, plotly for interactivity |
+| SMA slope + ADX for regime classification | Simple, no lookahead, interpretable | ✓ Good — per D-03 |
+| PineScript v5 (not v6) with migration comment | v6 too new, v5 universal in TradingView | ✓ Good — per D-18 |
+| Both strategy() and indicator() PineScript exports | Different use cases (backtesting vs live alerts) | ✓ Good — per D-17 |
+| Standalone HTML (no kaleido/Chrome dependency) | Portability — works on any machine with a browser | ✓ Good — CDN plotly.js |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
-**After each phase transition** (via `/gsd:transition`):
+**After each phase transition:**
 1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
+2. Requirements validated? → Move to Validated with milestone reference
 3. New requirements emerged? → Add to Active
 4. Decisions to log? → Add to Key Decisions
 5. "What This Is" still accurate? → Update if drifted
 
-**After each milestone** (via `/gsd:complete-milestone`):
+**After each milestone:**
 1. Full review of all sections
 2. Core Value check — still the right priority?
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-22 after Phase 5 completion — all v1.0 phases complete*
+*Last updated: 2026-03-22 after v1.0 milestone completion*
