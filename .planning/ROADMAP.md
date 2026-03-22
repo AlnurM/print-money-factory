@@ -26,7 +26,7 @@
 - [ ] **Phase 7: Maintenance Tooling** - Diagnostic command and automatic version checking
 - [ ] **Phase 8: Debug Cycle Memory** - Structured failed-approach tracking across debug iterations
 - [ ] **Phase 9: Bayesian Optimization** - Optuna TPE/CMA-ES integration with Ask-and-Tell API
-- [ ] **Phase 10: Enhanced Export** - Bot-building guide for going live after strategy approval
+- [x] **Phase 10: Enhanced Export** - Bot-building guide for going live after strategy approval (completed 2026-03-22)
 
 ## Phase Details
 
@@ -101,7 +101,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 10-01-PLAN.md -- Add bot-building-guide.md generation step to verify.md export pipeline
+- [x] 10-01-PLAN.md -- Add bot-building-guide.md generation step to verify.md export pipeline
 
 ## Progress
 
@@ -119,7 +119,7 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 7. Maintenance Tooling | v1.1 | 0/2 | Planning | - |
 | 8. Debug Cycle Memory | v1.1 | 1/2 | In Progress|  |
 | 9. Bayesian Optimization | v1.1 | 2/3 | In Progress|  |
-| 10. Enhanced Export | v1.1 | 0/1 | Planning | - |
+| 10. Enhanced Export | v1.1 | 1/1 | Complete   | 2026-03-22 |
 
 ---
 *Roadmap created: 2026-03-22*

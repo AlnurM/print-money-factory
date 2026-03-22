@@ -29,7 +29,7 @@
 
 ### Export
 
-- [ ] **EXPT-08**: `/brrr:verify --approved` generates a `bot-building-guide.md` with platform-specific step-by-step instructions for going live
+- [x] **EXPT-08**: `/brrr:verify --approved` generates a `bot-building-guide.md` with platform-specific step-by-step instructions for going live
 
 ## v2 Requirements
 
@@ -69,7 +69,7 @@
 | DBUG-03 | Phase 8 | Complete |
 | MANT-01 | Phase 7 | Complete |
 | MANT-02 | Phase 7 | Complete |
-| EXPT-08 | Phase 10 | Pending |
+| EXPT-08 | Phase 10 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 11 total
