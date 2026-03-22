@@ -52,11 +52,11 @@ Plans:
   2. Doctor checks actual package imports inside the venv (e.g., `python -c "import optuna"`), not just directory existence
   3. Running any `/brrr:*` command shows an update notice when a newer npm version is available (checked once per 24h session, silent on network failure)
   4. The version check never blocks or delays command execution
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
+- [ ] 07-01-PLAN.md -- Create /brrr:doctor diagnostic command and workflow
+- [ ] 07-02-PLAN.md -- Add version check preamble to all workflows
 
 ### Phase 8: Debug Cycle Memory
 **Goal**: Debug cycles carry forward knowledge of failed approaches so the AI never retries what already failed
@@ -116,7 +116,7 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 4. AI Backtest Loop | v1.0 | 2/2 | Complete | 2026-03-21 |
 | 5. Verify & Export | v1.0 | 3/3 | Complete | 2026-03-22 |
 | 6. Equity PNG Bug Fix | v1.1 | 0/1 | Planning | - |
-| 7. Maintenance Tooling | v1.1 | 0/? | Not started | - |
+| 7. Maintenance Tooling | v1.1 | 0/2 | Planning | - |
 | 8. Debug Cycle Memory | v1.1 | 0/? | Not started | - |
 | 9. Bayesian Optimization | v1.1 | 0/? | Not started | - |
 | 10. Enhanced Export | v1.1 | 0/? | Not started | - |
