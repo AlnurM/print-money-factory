@@ -222,6 +222,30 @@ Original idea: "{original idea from STRATEGY.md}"
    - Read each prior plan artifact: `.pmf/phases/phase_M_plan.md` (if exists) for all M < N
    - Read the last phase's best result: `.pmf/phases/phase_{N-1}_best_result.json` (if exists)
    - Read the last phase's verify report or diagnosis if it exists in `.pmf/phases/`
+   - Read ALL diagnosis JSON files (DBUG-02, DBUG-03): Use Glob to find `.pmf/phases/phase_*_diagnosis.json`. Read each one and collect:
+     - All `failed_approaches` entries across all files
+     - All `do_not_retry` entries (flattened from all failed_approaches across all files)
+     - The `overall_diagnosis` from the most recent diagnosis file
+     - The `suggested_changes` from the most recent diagnosis file
+   - Count total `failed_approaches` entries across all diagnosis files
+   - If total exceeds 50 (per DBUG-03), merge the oldest entries:
+     - Take the oldest N entries that bring the total down to 45 (leaving room for growth)
+     - Replace them with a single summary entry:
+       ```json
+       {
+         "iteration_range": "merged (phases 1-M)",
+         "params_tried": {},
+         "best_result": { "sharpe": best_sharpe_from_merged, "trades": total_trades_from_merged },
+         "diagnosis": "Early phases summary: [AI-generated 2-3 sentence summary of the merged entries]",
+         "do_not_retry": [all unique do_not_retry entries from merged entries, deduplicated]
+       }
+       ```
+     - Write the updated diagnosis files back (remove entries from oldest files, add merged entry to earliest remaining file)
+   - Store the collected data for use in Step 2-debug:
+     - `all_failed_approaches`: the full list (after any merging)
+     - `all_do_not_retry`: deduplicated flat list of all do_not_retry strings
+     - `latest_diagnosis`: overall_diagnosis from most recent file
+     - `latest_suggestions`: suggested_changes from most recent file
    - Summarize what you found:
      ```
      Prior phases loaded:
@@ -229,6 +253,8 @@ Original idea: "{original idea from STRATEGY.md}"
        ...
      Last phase metrics: Sharpe {X}, Max DD {Y}%, {Z} trades
      Verify diagnosis: {summary of what went wrong or what to improve}
+     Debug memory: {count} failed approaches across {file_count} diagnosis files
+     Do-not-retry constraints: {count} active
      ```
 
 ---
@@ -363,7 +389,28 @@ In debug mode, start from AI diagnosis of what went wrong, not from scratch.
    - How did the metrics compare to the success criteria?
    - What specific aspect failed? (entries too frequent, stops too tight, wrong market regime, etc.)
 
-2. Present the diagnosis to the user:
+2. **Present prior debug cycle memory** (DBUG-02):
+
+   If `phase_*_diagnosis.json` files were loaded in Step 1, present a failure summary table BEFORE the diagnosis:
+
+   ```
+   ## Prior Debug Cycles
+
+   | Phase | Iterations | Best Sharpe | Diagnosis | Do NOT Retry |
+   |-------|------------|-------------|-----------|--------------|
+   | {phase} | {iteration_range} | {best_sharpe} | {diagnosis (truncated to 60 chars)} | {do_not_retry entries, comma-separated} |
+   | ...   | ...        | ...         | ...       | ...          |
+
+   Active constraints ({count} total):
+   {bulleted list of ALL unique do_not_retry entries across all phases}
+
+   AI synthesis: {latest_overall_diagnosis from most recent diagnosis file}
+   Suggested starting point: {latest_suggested_changes, bulleted}
+   ```
+
+   If no `phase_*_diagnosis.json` files were found, skip this presentation and proceed with the existing diagnosis flow.
+
+3. Present the diagnosis to the user:
 
 ```
 --- Phase {N} Debug Analysis ---
@@ -383,11 +430,14 @@ Suggested changes:
 What do you think? Should we proceed with these changes, modify them, or take a different approach?
 ```
 
-3. Let the user react and discuss. This is a conversation -- the user may agree, disagree, or propose alternatives.
+   - **CRITICAL CONSTRAINT (DBUG-02):** When formulating the diagnosis and suggested changes, you MUST NOT propose any parameter ranges or approaches that overlap with entries in the `all_do_not_retry` list from Step 1. If your analysis suggests a parameter region that is in the do_not_retry list, explicitly state: "This region was already tried in Phase {N} and failed -- skipping." Choose an alternative direction instead.
 
-4. As the conversation proceeds, collect the updated decisions for all 7 topics (same tracker as first-discuss mode). Many will carry over from the previous phase -- only changed topics need discussion.
+4. Let the user react and discuss. This is a conversation -- the user may agree, disagree, or propose alternatives.
+   - If the user proposes a change that overlaps with a do_not_retry entry, warn them: "That approach was tried in Phase {N} and failed because: {diagnosis}. Are you sure you want to retry it?" Let the user override if they insist, but make the prior failure visible.
 
-5. **DRIFT DETECTION** -- Before proceeding to Step 3, compare ALL proposed changes against the original STRATEGY.md:
+5. As the conversation proceeds, collect the updated decisions for all 7 topics (same tracker as first-discuss mode). Many will carry over from the previous phase -- only changed topics need discussion.
+
+6. **DRIFT DETECTION** -- Before proceeding to Step 3, compare ALL proposed changes against the original STRATEGY.md:
 
    a. Read `.pmf/STRATEGY.md` and extract the **Original Idea** and **Hypothesis**
    b. Compare proposed changes against the original:
