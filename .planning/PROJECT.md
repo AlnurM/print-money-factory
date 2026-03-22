@@ -22,6 +22,8 @@ The iterative backtest loop must work end-to-end: a user describes a strategy id
 - ✓ `/brrr:plan` — parameter space, optimization method auto-select, train/test split, parameter budget enforcement — Phase 3
 - ✓ `/brrr:execute` — AI-driven backtest loop with holistic analysis, adaptive param changes, 4 stop conditions, per-iteration artifacts — Phase 4
 - ✓ Data sourcing via ccxt, yfinance, CSV with validation and caching — Phase 4
+- ✓ `/brrr:verify` — interactive HTML report (plotly) with equity curve, drawdown, iteration table, parameter heatmap, trade list, regime breakdown, benchmark comparison, metrics summary. Accept `--approved` (close milestone, generate exports) or `--debug` (open new phase cycle with AI diagnosis) — Phase 5
+- ✓ Export package on `--approved`: PineScript v5 (strategy + indicator), trading-rules.md, performance-report.md, backtest_final.py, live-checklist.md, report HTML — Phase 5
 
 ### Active
 - [ ] `/brrr:new-milestone` — scoping flow: parse context files, collect strategy idea, define scope (strategy/backtest/tuning/exports), set success criteria, output STRATEGY.md and STATE.md
@@ -94,4 +96,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-21 after Phase 4 completion*
+*Last updated: 2026-03-22 after Phase 5 completion — all v1.0 phases complete*
