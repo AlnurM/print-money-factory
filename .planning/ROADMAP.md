@@ -83,12 +83,12 @@ Plans:
   3. Interrupting and resuming with `--resume` loads the persisted SQLite study and continues from the existing probability model (no warmup restart)
   4. `/brrr:plan` offers Bayesian as an optimization method and auto-recommends it when parameter space exceeds 500 combinations
   5. Each iteration displays whether it is in "warmup" (random) or "guided" (Bayesian) mode
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 09-01: TBD
-- [ ] 09-02: TBD
-- [ ] 09-03: TBD
+- [ ] 09-01-PLAN.md -- Create optuna_bridge.py module with TDD (study lifecycle, sampler selection, Ask-and-Tell, scoring, resume)
+- [ ] 09-02-PLAN.md -- Add bayesian method to plan.md Step 4 (auto-selection, override, artifact fields)
+- [ ] 09-03-PLAN.md -- Add bayesian branch to execute.md (Ask-and-Tell loop, resume, warmup/guided display)
 
 ### Phase 10: Enhanced Export
 **Goal**: Approved strategies include a step-by-step guide for deploying to live trading
@@ -118,7 +118,7 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 6. Equity PNG Bug Fix | v1.1 | 0/1 | Planning | - |
 | 7. Maintenance Tooling | v1.1 | 0/2 | Planning | - |
 | 8. Debug Cycle Memory | v1.1 | 1/2 | In Progress|  |
-| 9. Bayesian Optimization | v1.1 | 0/? | Not started | - |
+| 9. Bayesian Optimization | v1.1 | 0/3 | Planning | - |
 | 10. Enhanced Export | v1.1 | 0/? | Not started | - |
 
 ---
