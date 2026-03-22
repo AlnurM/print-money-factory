@@ -70,7 +70,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 08-01-PLAN.md -- Add diagnosis JSON write to verify --debug workflow path
+- [x] 08-01-PLAN.md -- Add diagnosis JSON write to verify --debug workflow path
 - [ ] 08-02-PLAN.md -- Add debug memory reading and failure table to discuss workflow
 
 ### Phase 9: Bayesian Optimization
@@ -117,7 +117,7 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 5. Verify & Export | v1.0 | 3/3 | Complete | 2026-03-22 |
 | 6. Equity PNG Bug Fix | v1.1 | 0/1 | Planning | - |
 | 7. Maintenance Tooling | v1.1 | 0/2 | Planning | - |
-| 8. Debug Cycle Memory | v1.1 | 0/2 | Planning | - |
+| 8. Debug Cycle Memory | v1.1 | 1/2 | In Progress|  |
 | 9. Bayesian Optimization | v1.1 | 0/? | Not started | - |
 | 10. Enhanced Export | v1.1 | 0/? | Not started | - |
 
