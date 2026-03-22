@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Enhancement
 status: active
-stopped_at: Milestone v1.1 started
-last_updated: "2026-03-22T08:00:00.000Z"
+stopped_at: Roadmap created for v1.1
+last_updated: "2026-03-22T09:00:00.000Z"
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,14 +19,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** The iterative backtest loop must work end-to-end: idea -> backtest -> AI analysis -> adjustment -> repeat until targets hit or strategy diagnosed unviable.
-**Current focus:** Defining requirements for v1.1
+**Current focus:** Phase 6 - Equity PNG Bug Fix
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-22 — Milestone v1.1 started
+Phase: 6 of 10 (Equity PNG Bug Fix) -- first phase of v1.1
+Plan: --
+Status: Ready to plan
+Last activity: 2026-03-22 -- Roadmap created for v1.1
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -48,10 +50,11 @@ None yet.
 
 ### Blockers/Concerns
 
-- Equity PNG bug — matplotlib renders blank graphs during /brrr:execute iterations
+- Equity PNG bug -- matplotlib renders blank graphs during /brrr:execute iterations (Phase 6 target)
+- Phase 9 research flag -- Optuna Ask-and-Tell with SQLite persistence needs deeper verification before planning
 
 ## Session Continuity
 
-Last session: 2026-03-22T08:00:00.000Z
-Stopped at: Milestone v1.1 started
+Last session: 2026-03-22
+Stopped at: Roadmap created for v1.1
 Resume file: None

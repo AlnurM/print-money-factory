@@ -35,7 +35,7 @@
 
 ### Advanced Optimization
 
-- **OPT-05**: Monte Carlo simulation — randomize trade order to show equity curve confidence bands
+- **OPT-05**: Monte Carlo simulation -- randomize trade order to show equity curve confidence bands
 
 ### Additional Data Sources
 
@@ -48,34 +48,34 @@
 
 | Feature | Reason |
 |---------|--------|
-| Live trading bot (Binance/MetaTrader) | Separate domain — always a separate milestone after proven strategy |
+| Live trading bot (Binance/MetaTrader) | Separate domain -- always a separate milestone after proven strategy |
 | Real-time data streaming | Not needed for backtesting, adds infrastructure complexity |
 | Web UI / dashboard | Claude Code IS the interface; HTML reports are read-only output |
-| Multi-strategy portfolio backtesting | Different problem — correlation, allocation, rebalancing |
-| Multi-objective Optuna optimization | Adds plan.md/verify.md complexity — defer to v1.2 |
+| Multi-strategy portfolio backtesting | Different problem -- correlation, allocation, rebalancing |
+| Multi-objective Optuna optimization | Adds plan.md/verify.md complexity -- defer to v1.2 |
 | Full runnable bot code in export | Bot-building guide stays at "code pattern" level, not full bot |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BFIX-01 | TBD | Pending |
-| OPT-01 | TBD | Pending |
-| OPT-02 | TBD | Pending |
-| OPT-03 | TBD | Pending |
-| OPT-04 | TBD | Pending |
-| DBUG-01 | TBD | Pending |
-| DBUG-02 | TBD | Pending |
-| DBUG-03 | TBD | Pending |
-| MANT-01 | TBD | Pending |
-| MANT-02 | TBD | Pending |
-| EXPT-08 | TBD | Pending |
+| BFIX-01 | Phase 6 | Pending |
+| OPT-01 | Phase 9 | Pending |
+| OPT-02 | Phase 9 | Pending |
+| OPT-03 | Phase 9 | Pending |
+| OPT-04 | Phase 9 | Pending |
+| DBUG-01 | Phase 8 | Pending |
+| DBUG-02 | Phase 8 | Pending |
+| DBUG-03 | Phase 8 | Pending |
+| MANT-01 | Phase 7 | Pending |
+| MANT-02 | Phase 7 | Pending |
+| EXPT-08 | Phase 10 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 11 total
-- Mapped to phases: 0
-- Unmapped: 11
+- Mapped to phases: 11
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-22*
-*Last updated: 2026-03-22 after initial definition*
+*Last updated: 2026-03-22 after roadmap creation*
