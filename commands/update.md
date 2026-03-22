@@ -12,6 +12,6 @@ Update Print Money Factory to the latest version by re-running the install comma
 
 <process>
 1. Read `~/.pmf/.version` to record the current installed version.
-2. Run `npx print-money-factory@latest install` to update all commands, workflows, templates, and references.
+2. Run `npx @print-money-factory/cli@latest install` to update all commands, workflows, templates, and references.
 3. Read the new `~/.pmf/.version` and report what changed (version number, date).
 </process>
