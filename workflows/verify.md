@@ -789,12 +789,215 @@ Copy the generated HTML report to the output directory:
 cp .pmf/phases/phase_N_verify/report_v{N}.html .pmf/output/report_v{N}.html
 ```
 
-### 5a.8: Display Export Summary (EXPT-07)
+### 5a.8: Generate bot-building-guide.md (EXPT-08)
+
+Read strategy context:
+
+- `.pmf/STRATEGY.md` for asset class, exchange/source, timeframe
+- `.pmf/phases/phase_N_discuss.md` for strategy logic details
+- `.pmf/phases/phase_N_best_result.json` for optimized parameter values
+- `.pmf/output/trading-rules.md` for cross-reference with entry/exit rules
+
+Detect platform from STRATEGY.md:
+
+- Crypto assets (BTC, ETH, SOL, pairs with USDT/BTC, or exchange names like Binance/Bybit) -> Exchange API section using ccxt
+- Stock assets (ticker symbols like SPY, AAPL, TSLA, or broker names like Alpaca/IBKR) -> Broker API section (Alpaca, Interactive Brokers)
+- Forex assets (pairs like EUR/USD, GBP/JPY, or "forex" in strategy type) -> MT5/OANDA section
+- Ambiguous -> Include brief sections for all applicable platforms
+
+Write `.pmf/output/bot-building-guide.md` in practitioner tone, using direct second-person language throughout ("Set your API key...", "Configure position size to..."). Target audience is an experienced trader who knows their platform but hasn't automated this specific strategy. Use actual parameter values from best_result.json, not generic `{placeholder}` syntax. Code snippets are at the pattern level -- showing API call structure, not a full runnable bot.
+
+```markdown
+# Bot Building Guide: {strategy_name}
+
+> **Risk Warning:** This guide assumes you've validated the strategy in backtesting.
+> Past performance does not guarantee future results. Start with paper trading
+> or minimal position sizes.
+
+## 1. Prerequisites
+
+{Platform-specific requirements based on detected asset class.
+Use the actual asset and exchange/source from STRATEGY.md.
+
+For crypto: Exchange account (e.g., Binance, Bybit), API key with trading permissions,
+Python 3.10+ with ccxt installed.
+
+For stocks: Brokerage account (e.g., Alpaca, Interactive Brokers), API credentials,
+Python 3.10+ with alpaca-py or ib_async installed.
+NOTE: Use ib_async, NOT ib_insync (ib_insync is archived, ib_async is the active fork).
+
+For forex: MT5 terminal (Windows only) or OANDA account, API access token,
+Python 3.10+ with MetaTrader5 or oandapyV20 installed.}
+
+## 2. Platform Setup
+
+{Step-by-step API setup for the detected platform.
+Include a connection/authentication code pattern.
+
+For crypto (ccxt):
+```python
+import ccxt
+import os
+
+exchange = ccxt.binance({
+    'apiKey': os.environ['EXCHANGE_API_KEY'],
+    'secret': os.environ['EXCHANGE_SECRET'],
+    'enableRateLimit': True,
+    'options': {'defaultType': 'spot'}  # or 'future' for derivatives
+})
+
+# Verify connection
+balance = exchange.fetch_balance()
+```
+
+For stocks (Alpaca):
+```python
+from alpaca.trading.client import TradingClient
+import os
+
+client = TradingClient(
+    api_key=os.environ['ALPACA_API_KEY'],
+    secret_key=os.environ['ALPACA_SECRET_KEY'],
+    paper=True  # Start with paper trading
+)
+
+# Verify connection
+account = client.get_account()
+```
+
+For stocks (Interactive Brokers):
+```python
+from ib_async import IB
+
+ib = IB()
+ib.connect('127.0.0.1', 7497, clientId=1)  # 7497 for paper, 7496 for live
+
+# Verify connection
+account_values = ib.accountValues()
+```
+
+For forex (OANDA):
+```python
+import oandapyV20
+from oandapyV20 import API
+import os
+
+client = API(
+    access_token=os.environ['OANDA_TOKEN'],
+    environment='practice'  # Switch to 'live' when ready
+)
+
+# Note: OANDA uses underscores not slashes: EUR_USD not EUR/USD
+```
+
+For forex (MT5 -- Windows only):
+```python
+import MetaTrader5 as mt5
+
+mt5.initialize()
+mt5.login(login=YOUR_LOGIN, password='YOUR_PASSWORD', server='YOUR_SERVER')
+```
+
+For TradingView-based automation: Use the exported PineScript indicator with TradingView alerts connected to your broker's webhook endpoint. Most brokers (Alpaca, OANDA, some crypto exchanges) support webhook-triggered orders. Set the alert condition in TradingView to match the indicator's entry/exit signals, and configure the webhook URL provided by your broker or a middleware service like 3Commas or TradingView-to-anywhere.}
+
+## 3. Strategy Configuration
+
+{Map each parameter from best_result.json to the live trading configuration.
+Show how each parameter translates to live trading settings.
+
+Example for a momentum strategy with actual values from best_result.json:
+- fast_period: 10 -> Used in EMA calculation for signal generation
+- slow_period: 50 -> Used in EMA calculation for trend confirmation
+- atr_multiplier: 1.5 -> Stop loss distance = ATR * 1.5
+- risk_per_trade: 0.01 -> Risk 1% of account per trade
+
+Include a config dict or similar structure showing all parameters together.}
+
+## 4. Order Types & Execution
+
+{Which order types to use based on this strategy's entry/exit style.
+
+For strategies on higher timeframes (4H, Daily): Use limit orders to reduce slippage.
+Place limit at expected entry price, cancel if not filled within N bars.
+
+For strategies on lower timeframes (1M, 5M, 15M): Use market orders for speed.
+Accept slippage cost as part of execution.
+
+Slippage handling:
+- Include a slippage buffer in position sizing (e.g., 0.1% for crypto, 0.05% for stocks)
+- For stop losses: Use stop-market orders to guarantee execution
+- For take profits: Use limit orders at target price
+
+Platform-specific order patterns using the detected platform's API.}
+
+## 5. Risk Management
+
+{Position sizing formula using actual stop loss from best_result.json.
+
+Position Size = (Account Balance * risk_per_trade) / (Entry Price - Stop Loss Price)
+
+Example with actual values:
+If account = $10,000, risk_per_trade = 0.01, entry = $100, stop = $97 (1.5x ATR):
+Position Size = ($10,000 * 0.01) / ($100 - $97) = 33 shares
+
+Circuit breakers:
+- Daily loss limit: Stop trading if daily losses exceed 3-5% of account
+- Consecutive loss limit: Pause after 5 consecutive losing trades
+- Max drawdown kill switch: Stop all trading if drawdown exceeds the backtest max drawdown
+  (reference the actual max drawdown from best_result.json)
+
+Maximum concurrent positions: {from strategy logic or default to 1}.}
+
+## 6. Monitoring & Alerts
+
+{What to monitor:
+- Order execution: Confirm fills match expected prices
+- Position status: Verify open positions match expected state
+- Account equity: Track equity curve in real-time
+- API health: Monitor connection status and rate limits
+- Strategy drift: Compare live win rate and avg trade to backtest metrics after 20+ trades
+
+Notification setup (minimal webhook pattern):
+```python
+import requests
+
+def send_alert(message):
+    webhook_url = os.environ.get('ALERT_WEBHOOK_URL')
+    if webhook_url:
+        requests.post(webhook_url, json={
+            'content': f'[{strategy_name}] {message}'
+        })
+
+# Usage
+send_alert('BUY signal triggered: entry at $100.50')
+send_alert('Daily P&L: +$150 (3 trades)')
+```
+Works with Discord webhooks directly, or Telegram via Bot API.
+
+When to intervene: Only if execution fails, API disconnects, or metrics diverge
+significantly from backtest expectations. Do not override signals manually.}
+
+## 7. Go-Live Checklist
+
+{Strategy-specific pre-launch verification -- distinct from the generic live-checklist.md.
+
+- [ ] Paper traded for at least 2 weeks with this exact configuration
+- [ ] Verified parameter values match best_result.json exactly
+- [ ] API keys have correct permissions (trade, but no withdrawal)
+- [ ] Position sizing produces expected lot/share sizes at current prices
+- [ ] Stop loss orders are being placed correctly on the platform
+- [ ] Alert/notification system is receiving messages
+- [ ] Checked platform-specific constraints (minimum order size, tick size, trading hours)
+- [ ] Have a plan for handling platform outages or API downtime
+- [ ] Starting with minimum position size for first 10 live trades}
+```
+
+### 5a.9: Display Export Summary (EXPT-07)
 
 Count the files in `.pmf/output/` and display:
 
 ```
-Export package generated in output/ with {N} files.
+Export package generated in output/ with 8 files.
 
   pinescript_v5_strategy.pine    TradingView strategy (backtest)
   pinescript_v5_indicator.pine   TradingView indicator (alerts)
@@ -802,6 +1005,7 @@ Export package generated in output/ with {N} files.
   performance-report.md          Metrics summary for sharing
   backtest_final.py              Reproducible Python backtest
   live-checklist.md              Checklist before going live
+  bot-building-guide.md          Bot deployment guide for live trading
   report_v{N}.html               Interactive HTML report
 ```
 
@@ -1113,4 +1317,5 @@ This workflow covers the following requirements:
 | EXPT-04 | Step 5a.5 | backtest_final.py reproducible Python script |
 | EXPT-05 | Step 5a.6 | live-checklist.md step-by-step guide |
 | EXPT-06 | Step 5a.7 | Report HTML copied to output/ |
-| EXPT-07 | Step 5a.8 | All exports in output/ directory |
+| EXPT-07 | Step 5a.9 | All exports in output/ directory |
+| EXPT-08 | Step 5a.8 | bot-building-guide.md with platform-specific deployment instructions |
