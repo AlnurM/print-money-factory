@@ -56,7 +56,7 @@ Plans:
 
 Plans:
 - [x] 07-01-PLAN.md -- Create /brrr:doctor diagnostic command and workflow
-- [ ] 07-02-PLAN.md -- Add version check preamble to all workflows
+- [x] 07-02-PLAN.md -- Add version check preamble to all workflows
 
 ### Phase 8: Debug Cycle Memory
 **Goal**: Debug cycles carry forward knowledge of failed approaches so the AI never retries what already failed
