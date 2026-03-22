@@ -67,11 +67,11 @@ Plans:
   2. Running `/brrr:discuss` in debug mode displays all prior failed approaches as context before gathering new decisions
   3. Debug memory is scoped per-phase (Phase 3 failures do not leak into Phase 4 context)
   4. Debug memory stays under 50 entries regardless of how many debug iterations occur
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 08-01-PLAN.md -- Add diagnosis JSON write to verify --debug workflow path
+- [ ] 08-02-PLAN.md -- Add debug memory reading and failure table to discuss workflow
 
 ### Phase 9: Bayesian Optimization
 **Goal**: Users can run Optuna-powered Bayesian parameter optimization that outperforms random/grid search on large parameter spaces
@@ -117,7 +117,7 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 5. Verify & Export | v1.0 | 3/3 | Complete | 2026-03-22 |
 | 6. Equity PNG Bug Fix | v1.1 | 0/1 | Planning | - |
 | 7. Maintenance Tooling | v1.1 | 0/2 | Planning | - |
-| 8. Debug Cycle Memory | v1.1 | 0/? | Not started | - |
+| 8. Debug Cycle Memory | v1.1 | 0/2 | Planning | - |
 | 9. Bayesian Optimization | v1.1 | 0/? | Not started | - |
 | 10. Enhanced Export | v1.1 | 0/? | Not started | - |
 
