@@ -38,10 +38,10 @@
   1. Running `/brrr:execute` produces a PNG with a visible equity curve line when the backtest generates trades
   2. When a backtest iteration produces zero trades, the PNG is skipped gracefully with a logged warning instead of a blank image
   3. PNG file size is consistently above 5KB when trades exist (not a blank canvas)
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 06-01: TBD
+- [ ] 06-01-PLAN.md -- Return trades/equity_curve from run_backtest() and fix execute.md PNG generation
 
 ### Phase 7: Maintenance Tooling
 **Goal**: Users can diagnose installation health and know when updates are available
@@ -115,7 +115,7 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 3. Strategy Specification | v1.0 | 3/3 | Complete | 2026-03-21 |
 | 4. AI Backtest Loop | v1.0 | 2/2 | Complete | 2026-03-21 |
 | 5. Verify & Export | v1.0 | 3/3 | Complete | 2026-03-22 |
-| 6. Equity PNG Bug Fix | v1.1 | 0/? | Not started | - |
+| 6. Equity PNG Bug Fix | v1.1 | 0/1 | Planning | - |
 | 7. Maintenance Tooling | v1.1 | 0/? | Not started | - |
 | 8. Debug Cycle Memory | v1.1 | 0/? | Not started | - |
 | 9. Bayesian Optimization | v1.1 | 0/? | Not started | - |
