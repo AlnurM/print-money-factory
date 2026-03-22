@@ -1,191 +1,346 @@
-# Technology Stack
+# Technology Stack: v1.1 Enhancement
 
-**Project:** Print Money Factory
-**Researched:** 2026-03-21
+**Project:** Print Money Factory v1.1
+**Researched:** 2026-03-22
+**Scope:** Stack additions/changes for Bayesian optimization, enhanced export, diagnostic commands, debug cycle memory, and equity PNG fix
 
-## Overview
+## Executive Decision
 
-This project has two distinct technology surfaces: (1) an npm package that installs Claude Code slash commands, and (2) a Python backtest engine that runs inside a managed venv. The npm side is a thin distribution layer -- markdown files plus a Node.js install script. The Python side is where all computation happens.
+**No new Python or npm dependencies are needed.** All v1.1 features can be built with the existing stack. Optuna is already in requirements.txt. The equity PNG bug is a code pattern issue, not a missing library. The doctor command and version check use stdlib/npm CLI. Debug cycle memory is a workflow data structure change. Enhanced export is a template change.
 
-## Recommended Stack
+This is a workflow-and-pattern milestone, not a stack milestone.
 
-### NPM Package Layer
+---
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Node.js | >=18 | Runtime for install script | LTS baseline, required by Claude Code itself | HIGH |
-| npm (package.json) | -- | Package distribution | `npx print-money-factory install` is the install UX | HIGH |
-| esbuild (via tsup) | tsup ^8.4 | Bundle install script only | Zero-config, fast, proven by GSD pattern. Only needed if install script is TypeScript | MEDIUM |
-| shelljs or plain Node fs | ^0.8 | Install script file operations | Copy commands to `~/.claude/commands/brrr/`, create venv. No native deps | HIGH |
+## Feature-by-Feature Stack Analysis
 
-**Note on build complexity:** The GSD package publishes most files as-is (commands/, workflows/, templates/ are just markdown). Only the install script and any hooks need bundling. Do NOT over-engineer the npm side -- it is a file copier, not an application.
+### 1. Bayesian Optimization (Optuna Integration)
 
-### Python Backtest Engine
+**Already installed:** `optuna>=4.7,<5` in requirements.txt
+**Current stable:** Optuna 4.8.0 (confirmed via official docs)
+**Confidence:** HIGH
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Python | >=3.10 | Runtime | Minimum for all deps (dukascopy-python requires >=3.10, optuna requires >=3.9). 3.10 is safe floor | HIGH |
-| pandas | ^3.0 | Data manipulation, OHLCV handling | Released Jan 2026. Industry standard for time series. Breaking changes from 2.x are minimal | HIGH |
-| numpy | ^2.4 | Numerical computation | Required by pandas. Current stable is 2.4.3 (March 2026) | HIGH |
-| matplotlib | ^3.10 | Per-iteration equity curve PNGs | Lightweight, headless-friendly (Agg backend), no Chrome dependency. Use for quick iteration PNGs, NOT for final reports | HIGH |
-| plotly | ^6.5 | Interactive HTML reports | Standalone HTML with embedded JS. No server needed. Current stable is 6.5.2 (Jan 2026) | HIGH |
-| kaleido | ^1.0 | Static image export from plotly | Required for plotly PNG export. v1.0+ requires Chrome installed on machine -- use matplotlib instead for iteration PNGs to avoid this dep | MEDIUM |
-| optuna | ^4.7 | Bayesian optimization | Best-in-class for hyperparameter optimization. Supports TPE, GP, CMA-ES samplers. v4.7.0 (Jan 2026) | HIGH |
-| ccxt | latest | Crypto exchange data | 100+ exchanges, actively maintained, frequent releases. Pin to specific version at install time | HIGH |
-| yfinance | ^1.2 | Stock/forex daily data | v1.2.0 (Feb 2026). Unofficial Yahoo Finance API -- fragile but ubiquitous. No alternative with same coverage for free | MEDIUM |
-| dukascopy-python | latest | Forex intraday data | Tick-level to daily. Free, no API key. Requires Python >=3.10 | MEDIUM |
-| polygon-api-client | ^1.16 | Stocks intraday data (paid) | Use legacy package name, NOT `massive` (rebrand Oct 2025 is too fresh, users will search for "polygon"). Requires API key | MEDIUM |
-| scipy | ^1.14 | Statistical functions | Used in metric calculations (Sharpe, Sortino, distribution fitting). Pulled in by optuna anyway | HIGH |
-| ta | ^0.11 | Technical indicators | Lightweight, pandas-native. Alternative: ta-lib (faster but requires C compilation -- bad for venv portability) | MEDIUM |
+| Component | What to Use | Why |
+|-----------|------------|-----|
+| Sampler | `optuna.samplers.TPESampler` | Default and best for single-objective. Tree-structured Parzen Estimator handles mixed parameter types well |
+| Study | `optuna.create_study(sampler=TPESampler(), direction="maximize")` | Maximize Sharpe ratio as primary metric |
+| Parameter suggestion | `trial.suggest_int()`, `trial.suggest_float()` | Maps directly to existing parameter space format from plan workflow |
+| Pruning | `optuna.pruners.MedianPruner` | Early-stop unpromising trials. Reduces wasted compute on clearly bad parameter combos |
 
-### Infrastructure / Tooling
+**Integration point:** The execute workflow currently supports 3 optimization methods (grid, random, walk-forward). Optuna becomes a 4th method: `bayesian`. The plan workflow's auto-selection rules need a new tier:
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Python venv | stdlib | Isolation | Built into Python 3.10+. No additional deps. Created by install script | HIGH |
-| pip | bundled | Package installation | Installed inside venv. Use `requirements.txt` with pinned versions | HIGH |
-| Node.js child_process | stdlib | Invoke Python from commands if needed | Slash commands are markdown prompts, but install script needs to shell out to create venv | HIGH |
+```
+Current:
+  < 1000 combos  -> grid search
+  1000-10000     -> random search
+  3+ params OR > 10000 -> walk-forward
 
-### Supporting Libraries (Python)
+New (replace walk-forward as default for large spaces):
+  < 1000 combos  -> grid search
+  1000-10000     -> random search
+  3+ params OR > 10000 -> bayesian (optuna TPE)
+  Walk-forward remains available as user override
+```
 
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| jinja2 | ^3.1 | HTML report templating | Assembling the final plotly HTML report with multiple sections |
-| tabulate | ^0.9 | ASCII table formatting | Status command output, terminal-friendly metric displays |
-| requests | ^2.32 | HTTP fallback | CSV downloads, API fallbacks when primary libs fail |
-| pyyaml | ^6.0 | Config parsing | If strategy configs or parameter spaces use YAML format |
+**Key TPESampler settings for trading backtests:**
+
+| Setting | Value | Rationale |
+|---------|-------|-----------|
+| `n_startup_trials` | 10 | Enough random samples before TPE kicks in. Default is 10, appropriate for 3-6 parameter strategies |
+| `multivariate` | `True` | Trading strategy parameters are correlated (e.g., fast_period and slow_period). Joint sampling outperforms independent sampling per Optuna docs |
+| `group` | `True` | Works with multivariate to decompose search space into related subgroups |
+| `seed` | Fixed per study | Reproducibility across runs |
+
+**Critical integration detail:** Optuna's `study.optimize()` runs all trials internally in a loop. But the execute workflow needs to generate per-iteration output (the "brrr..." formatted blocks, verdict JSONs, equity PNGs). Solution: run `study.optimize(objective, n_trials=1)` in a loop to maintain the existing iteration display pattern. Each call adds one trial to the study, and TPE uses all prior trials to inform the next suggestion.
+
+**Code pattern:**
+
+```python
+import optuna
+from optuna.samplers import TPESampler
+
+def objective(trial):
+    params = {
+        'fast_period': trial.suggest_int('fast_period', 5, 50),
+        'slow_period': trial.suggest_int('slow_period', 20, 200),
+        # ... mapped from plan's parameter space
+    }
+    if params['fast_period'] >= params['slow_period']:
+        return float('-inf')  # Invalid combo
+
+    results = run_backtest(df_train, params)
+    return results['sharpe_ratio']
+
+sampler = TPESampler(multivariate=True, group=True, seed=42)
+study = optuna.create_study(sampler=sampler, direction='maximize')
+
+# Run one trial at a time for per-iteration output
+for i in range(n_trials):
+    study.optimize(objective, n_trials=1)
+    trial = study.trials[-1]
+    # Generate iteration artifacts (metrics JSON, params JSON, equity PNG)
+    # Display formatted iteration block
+```
+
+**What NOT to add:**
+- Do NOT add `optuna-dashboard` -- requires a server, violates CLI-only constraint
+- Do NOT add `SQLAlchemy` for optuna storage -- in-memory storage is fine for 20-50 trials per phase
+- Do NOT use `optuna.visualization` -- adds complexity; existing report generator handles visualization
+- Do NOT use multi-objective optimization (NSGA-II) -- single-objective Sharpe + post-hoc OOS validation is simpler and proven
+
+---
+
+### 2. Enhanced Export: MD-Instruction Format
+
+**Already installed:** `jinja2>=3.1,<4` in requirements.txt
+**No new dependencies needed.**
+**Confidence:** HIGH
+
+| Component | What to Use | Why |
+|-----------|------------|-----|
+| Templating | Jinja2 (existing) | Already used for HTML report. Same engine, new template |
+| Output format | Markdown (.md) | Universal, readable by any LLM or human |
+
+This is purely a new template file and workflow change. The MD-instruction format is a structured guide that tells a developer (or another AI) how to implement the strategy as a live trading bot.
+
+**What NOT to add:**
+- Do NOT add a markdown-to-HTML converter -- the export IS markdown
+- Do NOT add `mdformat` or markdown linting -- Claude generates clean markdown
+- Do NOT add Pandoc for PDF conversion -- users asked for MD, not PDF
+
+---
+
+### 3. `/brrr:doctor` Diagnostic Command
+
+**No new dependencies.** Uses Python stdlib and shell commands.
+**Confidence:** HIGH
+
+| Check | Implementation | Tool |
+|-------|---------------|------|
+| Python version | `~/.pmf/venv/bin/python --version` | Bash (workflow) |
+| Venv exists | Check `~/.pmf/venv/` directory | Bash (workflow) |
+| Venv health | `~/.pmf/venv/bin/python -c "import sys; print(sys.version)"` | Bash (workflow) |
+| Dependencies installed | `~/.pmf/venv/bin/pip list --format=json` | Bash (workflow) |
+| Missing packages | Compare pip list against requirements.txt | Claude reasoning |
+| Commands installed | Check `~/.claude/commands/brrr/*.md` exists | Bash/Glob (workflow) |
+| Workflows installed | Check `~/.pmf/workflows/*.md` exists | Bash/Glob (workflow) |
+| References installed | Check `~/.pmf/references/*.py` exists | Bash/Glob (workflow) |
+| Disk usage | `du -sh ~/.pmf/` | Bash (workflow) |
+
+**Implementation:** New slash command (`.md`) + new workflow (`.md`). The workflow instructs Claude to run diagnostic Bash commands and format output using `tabulate` (already installed).
+
+**What NOT to add:**
+- Do NOT add `node-doctor` or any npm diagnostic package
+- Do NOT write a standalone Python diagnostic script -- the workflow instructs Claude to run checks directly
+
+---
+
+### 4. Auto Version Check
+
+**No new dependencies.** Uses `npm view` CLI command.
+**Confidence:** HIGH
+
+| Component | Implementation | Tool |
+|-----------|---------------|------|
+| Get latest version | `npm view @print-money-factory/cli version 2>/dev/null` | Bash (workflow preamble) |
+| Get installed version | Read `~/.pmf/version.txt` (written by install script) | Read (workflow preamble) |
+| Compare versions | String comparison | Claude reasoning |
+| Rate limiting | Timestamp file `~/.pmf/.last_version_check` | Read/Write (workflow preamble) |
+
+**Session tracking:** Write `~/.pmf/.last_version_check` with ISO timestamp. On each `/brrr:*` command, the preamble checks if this file is less than 24 hours old. If so, skip. If not, run the check.
+
+**Output (only when update available):**
+```
+[UPDATE] print-money-factory v{new} available (you have v{current})
+Run: npx print-money-factory install
+```
+
+**What NOT to add:**
+- Do NOT add `semver` npm package -- version comparison for "0.4.0" vs "0.5.0" is trivial string logic
+- Do NOT add `update-notifier` -- designed for CLI tools, not slash command workflows
+- Do NOT hit registry.npmjs.org API directly -- `npm view` is simpler and already available
+
+---
+
+### 5. Smarter Debug Cycles (Failed Approach Memory)
+
+**No new dependencies.** Workflow data structure change.
+**Confidence:** HIGH
+
+| Component | What to Use | Why |
+|-----------|------------|-----|
+| Storage format | JSON file per phase | Consistent with existing `iter_NN_verdict.json` pattern |
+| Storage location | `.pmf/phases/phase_N_diagnosis.json` | Alongside other phase artifacts |
+| Read pattern | Glob + Read in debug-discuss mode | Already done for other artifacts |
+
+**New artifact: `phase_N_diagnosis.json`** -- written by verify workflow when verdict is "debug":
+
+```json
+{
+  "phase": 1,
+  "verdict": "debug",
+  "approaches_tried": [
+    {
+      "description": "RSI oversold/overbought with SMA filter",
+      "why_failed": "Too few trades (12 in 2 years). RSI(14) rarely hits 30/70 on BTC 4H",
+      "metrics": {"sharpe": 0.4, "max_dd": -8.2, "trades": 12},
+      "lesson": "Need faster indicator or lower thresholds for crypto volatility"
+    }
+  ],
+  "parameter_ranges_exhausted": {
+    "rsi_period": [7, 14, 21],
+    "rsi_oversold": [20, 25, 30]
+  },
+  "suggested_next_direction": "Try MACD crossover or reduce RSI thresholds below 25/above 75"
+}
+```
+
+**Written by:** verify workflow when verdict is "debug"
+**Read by:** discuss workflow in debug-discuss mode (Step 2-debug, Step 1 context load)
+
+**What NOT to add:**
+- Do NOT add SQLite or any database for storing history -- JSON files are sufficient and human-inspectable
+- Do NOT add vector embeddings for semantic search over past approaches -- overkill for 3-5 debug cycles
+
+---
+
+### 6. Fix Blank Equity PNG Bug
+
+**No new dependencies.** Code pattern fix in execute workflow template.
+**Confidence:** HIGH
+
+**Root cause (from codebase review of execute.md lines 522-553):**
+
+The equity curve PNG generation reconstructs the equity from trades instead of using the actual equity array from the backtest engine. This fails when:
+
+1. **No trades generated** -- `results_is.get('trades', [])` returns empty list, equity becomes `[initial_capital]` (single point), matplotlib plots an invisible dot
+2. **Lossy reconstruction** -- the trade-based reconstruction loses intra-trade equity movement (mark-to-market), producing a step function instead of the smooth curve the engine actually computed
+
+**The fix** is a workflow template change (not a library change):
+
+```python
+# BEFORE (buggy - reconstructs from trades, loses intra-trade equity)
+trades_is = results_is.get('trades', [])
+equity = [initial_capital]
+for t in trades_is:
+    pnl = t.get('pnl', 0)
+    equity.append(equity[-1] + pnl)
+
+# AFTER (correct - uses actual bar-by-bar equity curve from engine)
+equity_arr = np.array(results_is.get('equity_curve', [initial_capital]))
+if len(equity_arr) <= 1:
+    print("WARNING: No equity data to plot (no trades generated)")
+else:
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(equity_arr, linewidth=1, color='#2196F3')
+    # ... rest of existing plot code
+```
+
+**Additional safeguards to add to the template:**
+- Guard against empty equity curve (skip PNG, log warning)
+- Ensure `matplotlib.use('Agg')` is the FIRST matplotlib statement
+- Keep existing `plt.close(fig)` + `plt.close('all')` for memory leak prevention
+
+**Verification:** `compute_all_metrics()` in `metrics.py` receives `equity_curve` as a parameter and includes it in the return dict. The `run_backtest()` function in `backtest_engine.py` passes `np.array(equity)` to `compute_all_metrics()`. The data is already available -- the workflow template just needs to use it.
+
+**What NOT to add:**
+- Do NOT switch to plotly for iteration PNGs -- matplotlib Agg is correct (lighter, headless, no Chrome)
+- Do NOT add Pillow for image verification -- the fix is in the data source, not image processing
+
+---
+
+## Stack Changes Summary
+
+| Feature | New Dependencies | Change Type |
+|---------|-----------------|-------------|
+| Bayesian optimization | NONE (optuna already installed) | Workflow + code pattern |
+| Enhanced export | NONE (jinja2 already installed) | New template file |
+| `/brrr:doctor` | NONE | New command + workflow |
+| Auto version check | NONE | Preamble addition to workflows |
+| Debug cycle memory | NONE | New JSON artifact format |
+| Equity PNG fix | NONE | Fix data source in execute template |
+
+**Total new pip packages: 0**
+**Total new npm packages: 0**
+**requirements.txt changes: NONE**
+**package.json changes: Version bump only (e.g., 0.5.0)**
+
+---
+
+## Existing Stack Confirmation
+
+All currently installed packages are sufficient. No version bumps needed:
+
+| Package | Current Pin | Needed For v1.1 | Status |
+|---------|------------|-----------------|--------|
+| optuna | >=4.7,<5 | Bayesian optimization (TPESampler) | Sufficient -- 4.8.0 stable is in range |
+| matplotlib | >=3.10,<4 | Equity PNG fix (Agg backend) | Sufficient -- 3.10.8 stable |
+| jinja2 | >=3.1,<4 | Enhanced export MD template | Sufficient |
+| tabulate | >=0.9,<1 | Doctor command output formatting | Sufficient |
+| plotly | >=6.5,<7 | Existing reports (unchanged) | Sufficient |
+| pandas | >=3.0,<4 | Existing data handling (unchanged) | Sufficient |
+| numpy | >=2.4,<3 | Existing computation (unchanged) | Sufficient |
+
+---
 
 ## Alternatives Considered
 
-| Category | Recommended | Alternative | Why Not |
-|----------|-------------|-------------|---------|
-| Backtest framework | Claude-written engine | vectorbt, backtesting.py, zipline | Project decision: max flexibility per strategy. Frameworks impose structure that constrains novel strategies |
-| Optimization | optuna | scipy.optimize, hyperopt, Ax | Optuna has best API for iterative optimization, pruning, visualization. Hyperopt is unmaintained. Ax is heavy |
-| Data viz (iterations) | matplotlib | plotly | Matplotlib is lighter, no Chrome dep for PNG, faster for simple equity curves |
-| Data viz (reports) | plotly | bokeh, altair | Plotly HTML embeds are self-contained, interactive, well-documented. Bokeh requires more boilerplate |
-| Technical indicators | ta | ta-lib, pandas-ta | ta-lib needs C compilation (portability nightmare). pandas-ta is less maintained. ta is pure Python, pandas-native |
-| Forex data | dukascopy-python | FXCM, Oanda API | Dukascopy is free, no account needed, tick-level data. Others require accounts |
-| Crypto data | ccxt | Individual exchange APIs | ccxt unifies 100+ exchanges behind one API. No reason to use individual clients |
-| Stock data (free) | yfinance | alpha_vantage, quandl | yfinance has broadest coverage for free. Alpha Vantage has strict rate limits. Quandl is now Nasdaq Data Link (paid) |
-| Stock data (paid) | polygon (massive) | IEX Cloud, Tiingo | Polygon has best intraday coverage and cleanest API. Use polygon-api-client (legacy name) |
-| NPM bundler | tsup | rollup, webpack, unbundled | tsup is zero-config, esbuild-powered. Only needed for install script. GSD uses esbuild directly |
-| Package format | ESM + CJS (tsup) | ESM only | Some Node.js tooling still expects CJS. Dual format avoids compatibility issues |
-| HTML templating | jinja2 | mako, string templates | Jinja2 is the Python standard. Claude will know it. Mako adds nothing |
-| PNG generation | matplotlib (Agg) | pillow, kaleido | Matplotlib is already needed. Agg backend works headless without Chrome. Kaleido v1 requires Chrome |
+| Feature | Considered | Why Not |
+|---------|-----------|---------|
+| Bayesian opt | Ax (Facebook) | Heavy -- pulls in PyTorch. Optuna is already installed |
+| Bayesian opt | Hyperopt | Unmaintained since 2023. Optuna is the successor |
+| Bayesian opt | optuna-dashboard | Requires server process. Violates CLI-only constraint |
+| Bayesian opt | Multi-objective (NSGA-II) | Adds complexity. Single-objective + post-hoc OOS validation is proven |
+| Version check | update-notifier npm package | Designed for CLI entry points, not slash command workflows |
+| Version check | Direct registry.npmjs.org API | npm view already does this without HTTP client code |
+| Version check | semver npm package | Version comparison for "0.4.0" vs "0.5.0" is trivial |
+| Debug memory | SQLite database | JSON files are simpler, inspectable, consistent with existing artifact pattern |
+| Debug memory | Vector embeddings | Massive overkill for 3-5 debug cycles |
+| PNG fix | Plotly for iteration charts | Heavier, requires CDN or embedded JS. Matplotlib Agg is correct for headless PNGs |
+| PNG fix | Pillow for image validation | Fix is in the data source, not image processing |
+| Export format | Pandoc for MD-to-PDF | Users asked for MD, not PDF. Pandoc is a heavy system dep |
 
-## Critical Decisions
+---
 
-### 1. matplotlib for iteration PNGs, plotly for final HTML reports
+## Integration Points (for roadmap)
 
-**Rationale:** Kaleido v1.0 (required by plotly for static image export) now requires Chrome installed on the machine. This is an unacceptable dependency for a CLI tool that runs in diverse environments. Use matplotlib with the Agg backend for per-iteration equity PNGs (fast, headless, zero external deps). Use plotly only for the final interactive HTML report where its strengths (hover, zoom, pan) justify the heavier library.
+### Optuna in plan.md + execute.md
 
-### 2. polygon-api-client, NOT massive
+**plan.md changes:**
+- Add `bayesian` as 4th optimization method option
+- Update auto-selection: 3+ params OR >10000 combos -> bayesian (was walk-forward)
+- Walk-forward remains as user override option
 
-**Rationale:** Polygon.io rebranded to Massive.com in October 2025. The Python client was renamed from `polygon-api-client` to `massive`. However, every tutorial, StackOverflow answer, and documentation resource still references "polygon." The legacy package (v1.16.3) remains available and `api.polygon.io` continues to work. Using the legacy name reduces user confusion. Migrate to `massive` in a future version when the ecosystem catches up.
+**execute.md changes:**
+- New code path for `method == "bayesian"` in Step 5a (script generation)
+- Build optuna study with TPESampler
+- Map parameter space from plan artifact to `trial.suggest_*()` calls
+- Run `study.optimize(objective, n_trials=1)` in a loop (preserves per-iteration output)
+- Per-trial: generate artifacts (metrics JSON, params JSON, equity PNG, verdict JSON)
+- Study best_params used for final OOS validation
 
-### 3. ta (pure Python) over ta-lib (C extension)
+### Version check preamble in all workflows
 
-**Rationale:** ta-lib requires compiling C extensions, which fails frequently in venv setups across platforms (especially macOS ARM). The `ta` library is pure Python, installs cleanly everywhere, and covers all standard indicators (RSI, MACD, Bollinger, ATR, etc.). The performance difference is irrelevant for backtesting (not real-time).
+Add AFTER sequence validation, BEFORE context file scan. Must be non-blocking (network errors = silent skip). Rate-limited to once per 24 hours via timestamp file.
 
-### 4. No pinescript transpiler library
+### Diagnosis JSON: verify writes, discuss reads
 
-**Rationale:** PineScript v5 export will be done by Claude generating the PineScript code from the strategy description and parameters -- not by transpiling Python to PineScript. Libraries like `pynescript` parse PineScript INTO Python (wrong direction). Claude is better at generating idiomatic PineScript than any transpiler.
+- **verify.md:** When verdict is "debug", compile `phase_N_diagnosis.json` from iteration verdicts before incrementing phase counter
+- **discuss.md:** In debug-discuss mode (Step 1), Glob all `phase_*_diagnosis.json` files and build cumulative memory of what was tried
 
-### 5. Python >=3.10, not 3.12+
+### Equity PNG fix in execute.md
 
-**Rationale:** 3.10 is the highest minimum that satisfies all deps (dukascopy-python requires >=3.10). Going higher (3.12+) would exclude users on older systems without adding value. The backtest engine uses no 3.11+ features (match statements, ExceptionGroup, etc. are not needed).
+- Change the Python script template in Step 5a to use `results_is['equity_curve']` instead of reconstructing from trades
+- Add empty-data guard to skip PNG generation when no trades
+- No changes to backtest_engine.py or metrics.py needed
 
-## Package Structure (npm side)
-
-```
-print-money-factory/
-  package.json            # name, version, bin, files
-  bin/
-    install.mjs           # npx entry point: copies commands, creates venv
-    update.mjs            # version check + update
-  commands/               # .md files -> ~/.claude/commands/brrr/
-    new-milestone.md
-    discuss.md
-    research.md
-    plan.md
-    execute.md
-    verify.md
-    status.md
-    update.md
-  workflows/              # multi-step workflow definitions
-  templates/              # Python templates (backtest runner, report)
-    backtest_runner.py    # skeleton that Claude fills in
-    report_template.html  # jinja2 template for plotly report
-  references/             # strategy patterns, indicator docs
-  requirements.txt        # pinned Python deps for venv
-```
-
-## Python venv Structure (created by install)
-
-```
-~/.pmf/
-  venv/                   # Python virtual environment
-    bin/python
-    bin/pip
-    lib/python3.x/site-packages/
-  data/                   # cached market data
-  config.yaml             # API keys (polygon, etc.)
-```
-
-## Installation Flow
-
-```bash
-# User runs:
-npx print-money-factory install
-
-# Script does:
-# 1. Copies commands/*.md -> ~/.claude/commands/brrr/
-# 2. Copies workflows/, templates/, references/ -> ~/.pmf/
-# 3. Detects python3 (>=3.10), creates ~/.pmf/venv/
-# 4. pip install -r requirements.txt inside venv
-# 5. Verifies installation (import test)
-```
-
-## requirements.txt (pinned)
-
-```
-pandas>=3.0,<4
-numpy>=2.4,<3
-matplotlib>=3.10,<4
-plotly>=6.5,<7
-optuna>=4.7,<5
-ccxt>=4.0
-yfinance>=1.2,<2
-dukascopy-python>=0.3
-polygon-api-client>=1.16,<2
-scipy>=1.14,<2
-ta>=0.11,<1
-jinja2>=3.1,<4
-tabulate>=0.9,<1
-requests>=2.32,<3
-pyyaml>=6.0,<7
-```
-
-## Version Pinning Strategy
-
-Use **compatible release ranges** (>=X.Y,<next-major) in requirements.txt. This allows patch updates while preventing breaking changes. The install script runs `pip install -r requirements.txt` which resolves latest compatible versions at install time.
-
-Do NOT use exact pins (==) -- they cause conflicts when users have other Python projects. Do NOT use unpinned (no upper bound) -- major version bumps break things.
+---
 
 ## Sources
 
-- [tsup npm package](https://www.npmjs.com/package/tsup) - npm bundling
-- [Create a Modern npm Package in 2026](https://jsmanifest.com/create-modern-npm-package-2026) - npm best practices
-- [ccxt GitHub](https://github.com/ccxt/ccxt) - crypto data
-- [yfinance PyPI](https://pypi.org/project/yfinance/) - stock data, v1.2.0
-- [optuna GitHub](https://github.com/optuna/optuna) - optimization, v4.7.0
-- [plotly PyPI](https://pypi.org/project/plotly/) - visualization, v6.5.2
-- [kaleido PyPI](https://pypi.org/project/kaleido/) - static image export, v1.0 Chrome requirement
-- [Plotly static image generation changes](https://plotly.com/python/static-image-generation-changes/) - kaleido v1 breaking changes
-- [pandas 3.0 release notes](https://pandas.pydata.org/docs/whatsnew/v3.0.0.html) - pandas 3.0
-- [matplotlib PyPI](https://pypi.org/project/matplotlib/) - v3.10.8
-- [dukascopy-python PyPI](https://pypi.org/project/dukascopy-python/) - forex data
-- [polygon-api-client PyPI](https://pypi.org/project/polygon-api-client/) - stocks intraday, rebrand notice
-- [Polygon.io -> Massive.com rebrand](https://github.com/polygon-io/client-python) - client-python rebrand details
-- [get-shit-done-cc npm](https://www.npmjs.com/package/get-shit-done-cc) - GSD architecture pattern
-- [Python venv docs](https://docs.python.org/3/library/venv.html) - stdlib venv
+- [Optuna 4.8.0 TPESampler documentation](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html) - TPE sampler parameters, multivariate mode, constructor options
+- [Optuna Study API docs](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.Study.html) - create_study and optimize patterns
+- [Matplotlib savefig blank image causes](https://pythonguides.com/matplotlib-savefig-blank-image/) - 5 common causes of blank PNGs with fixes
+- [Matplotlib savefig API reference](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html) - savefig parameters and backend behavior
+- [npm view documentation](https://docs.npmjs.com/cli/v7/commands/npm-view/) - Registry version lookup via CLI
+- [npm registry API guide](https://www.tutorialpedia.org/blog/get-versions-from-npm-registry-api/) - Programmatic version checking, rate limits

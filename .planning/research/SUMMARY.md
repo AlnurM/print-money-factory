@@ -1,210 +1,213 @@
 # Project Research Summary
 
-**Project:** Print Money Factory
-**Domain:** AI-driven trading strategy development CLI (Claude Code slash-command npm package)
-**Researched:** 2026-03-21
+**Project:** Print Money Factory v1.1 Enhancement
+**Domain:** AI-assisted trading strategy development CLI — backtest-to-export pipeline
+**Researched:** 2026-03-22
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Print Money Factory is a Claude Code slash-command package that guides users through an AI-driven backtest-to-export pipeline for trading strategies. The product has two distinct technical surfaces: a thin npm distribution layer (file copier + install script) and a Python computation engine (backtest, optimization, reporting) running in an isolated venv. The right mental model is not "build a backtesting framework" — it is "build reference patterns that Claude uses to write custom Python per strategy." Every strategy gets fresh, tailored code; the package ships the patterns and plumbing, not a generic library. This is the architectural choice that separates this tool from competitors like backtesting.py and vectorbt.
+Print Money Factory v1.1 is a workflow-and-pattern milestone, not a stack milestone. Every feature in scope can be built with the libraries already installed: Optuna is in requirements.txt but unused, Jinja2 is installed for HTML reports and will serve the new MD export, and matplotlib Agg is already used for iteration PNGs. The stack decision is settled — zero new Python or npm dependencies are needed. This frees the entire development effort for workflow design, integration logic, and bug repair rather than dependency management.
 
-The recommended approach is straightforward: lean on the GSD (get-shit-done) pattern for the npm/command side, use a thin command → fat workflow delegation structure, and make STATE.md the single router for the milestone lifecycle. On the Python side, ship a verified metrics module and canonical event-loop backtest pattern in references/, then let Claude compose those building blocks into strategy-specific code at runtime. Use matplotlib for iteration PNGs (headless, no Chrome dep), plotly for the final interactive HTML report, and optuna for Bayesian optimization once grid search is proven. The AI-driven iteration loop — where Claude reads metrics + equity curves, diagnoses problems, and adjusts parameters automatically — is the core differentiator and must work well before anything else matters.
+The six v1.1 features split into two categories: one bug fix (blank equity PNG) and five additive enhancements (Bayesian optimization, debug cycle memory, doctor command, auto version check, enhanced export). Architecture research confirms a clear build order grounded in dependencies and risk: fix the bug first (smallest change surface, unblocks visual feedback for all other features), add independent tooling (doctor, version check), improve the debug loop (debug memory), then integrate Bayesian optimization using Optuna's Ask-and-Tell API so the per-iteration architecture stays intact. Enhanced export lands last as a purely additive verify step.
 
-The highest-risk areas are lookahead bias in Claude-generated backtest code, overfitting through excessive parameter optimization, and silent failures in financial metric calculations. All three have HIGH recovery costs (requires discarding and re-running all previous results). These must be addressed in Phase 1 by shipping a fixed, tested metrics module and a canonical event-loop pattern in references/ that all generated code must follow. The npm install reliability is also critical — a failed silent install means users never reach the value proposition.
+The critical risk across all features is integration pattern fidelity. Optuna must use Ask-and-Tell (not `study.optimize()`) to preserve per-iteration artifacts. Debug memory must be a fixed-size summary table (not an append log) to avoid context explosion. The doctor command must check actual package imports inside the venv, not just that the venv directory exists. Optuna's SQLite study persistence must be part of the initial integration, not an afterthought — in-memory studies lose the TPE model on `--resume`, wasting all warmup iterations. Each of these has a clearly documented "looks done but isn't" failure mode that must appear explicitly in each phase's acceptance criteria.
+
+---
 
 ## Key Findings
 
 ### Recommended Stack
 
-The npm layer is deliberately thin: Node.js >=18, plain `fs` operations to copy command files, and a Node.js install script that creates the Python venv. No framework needed — it is a file copier. The Python layer is where all computation happens: Python >=3.10 (floor set by dukascopy-python), pandas ^3.0, numpy ^2.4, matplotlib ^3.10 for iteration PNGs, plotly ^6.5 for HTML reports, optuna ^4.7 for Bayesian optimization, and data sources (ccxt, yfinance, dukascopy-python, polygon-api-client). Three critical version decisions stand out: use `polygon-api-client` (not `massive` — the rebrand is too recent for ecosystem adoption), use `ta` (pure Python indicators) not `ta-lib` (C extension that fails on macOS ARM), and use matplotlib Agg backend for PNGs (kaleido v1.0 now requires Chrome, which is unacceptable for a CLI tool).
+No new dependencies. See `.planning/research/STACK.md` for full analysis.
 
-**Core technologies:**
-- Node.js >=18 / npm: distribution layer — npx install UX, file copying, venv creation
-- Python >=3.10 + venv: computation isolation — all backtest, optimization, and reporting runs here
-- pandas ^3.0 + numpy ^2.4: data manipulation — industry standard for OHLCV time series
-- matplotlib ^3.10 (Agg): iteration equity PNGs — headless, no Chrome dep
-- plotly ^6.5: final HTML reports — self-contained interactive files, no server needed
-- optuna ^4.7: Bayesian optimization — TPE sampler, pruning, best-in-class API
-- ccxt + yfinance + dukascopy-python + polygon-api-client: data sources — crypto/stocks/forex coverage
-- ta ^0.11: technical indicators — pure Python, pandas-native, no C compilation
-- jinja2 ^3.1: HTML report templating — Python standard, Claude knows it well
+**Core technologies (all existing):**
+- `optuna>=4.7,<5` (4.8.0 stable): Bayesian optimization via TPESampler — already installed, currently unused
+- `matplotlib>=3.10,<4` (Agg backend): iteration equity PNGs — correct choice, headless, no Chrome dep
+- `jinja2>=3.1,<4`: enhanced export MD template — same engine already used for HTML report
+- `tabulate>=0.9,<1`: doctor command output formatting — already installed
+- `npm view` CLI: version check — no HTTP client code needed, zero new packages
+
+**Critical version note:** Optuna 4.8.0 is current stable and within the `>=4.7,<5` pin. TPESampler's `multivariate=True` mode (available in 4.7+) is required for trading parameters because fast_period and slow_period are correlated — independent sampling produces worse suggestions than joint sampling.
+
+**What NOT to add:**
+- `optuna-dashboard` — requires server, violates CLI-only constraint
+- `SQLAlchemy` — Optuna's SQLite storage works without it
+- `kaleido` — v1.0 requires Chrome; matplotlib Agg is the right choice for iteration PNGs
+- `semver` npm package — version comparison for "0.4.0" vs "0.5.0" is trivial string logic
 
 ### Expected Features
 
-**Must have (table stakes):**
-- Core metrics suite (net P&L, win rate, profit factor, max drawdown, Sharpe, Sortino) — traders evaluate strategies on these; missing any = amateur
-- Commission and slippage modeling — without this, all metrics are lies
-- Equity curve + drawdown visualization — per-iteration PNG during execute, plotly in final report
-- Trade log with per-trade details — traders audit individual trades; black-box results = distrust
-- In-sample / out-of-sample split — enforced by default; testing on optimization data is the #1 beginner mistake
-- Grid search parameter optimization — simple, understandable; baseline expectation
-- AI-driven iteration loop — THE differentiator; Claude reads metrics, diagnoses, adjusts, re-runs
-- HTML report generation — traders need a shareable deliverable
-- PineScript v5 export — bridge from backtest to live trading; table stakes for retail traders
-- At least one working data source (ccxt or yfinance) — can't run without data
+See `.planning/research/FEATURES.md` for full feature table with complexity and dependency analysis.
 
-**Should have (competitive differentiators):**
-- AI post-mortem diagnosis on debug cycles — no competitor does this
-- Walk-forward analysis — gold standard validation; most retail tools skip it
-- Bayesian optimization via optuna — smarter than grid search for large parameter spaces
-- Parameter heatmap in HTML report — instantly reveals robustness vs fragility
-- Regime breakdown analysis — shows WHEN a strategy works, not just IF
-- Monte Carlo simulation — reveals path-dependent luck in results
-- Hypothesis drift protection — detects when iterative tweaking has diverged from original idea
-- Context file support (images/PDFs in .pmf/context/) — leverages Claude's multimodal capability
+**Must have (table stakes for v1.1):**
+- Fix blank equity PNG — broken in v1.0, users see nothing during optimization; zero-dependency fix
+- Optuna TPE integration with Ask-and-Tell in execute loop — the headline feature; replaces AI-only parameter selection with AI-guided Bayesian search
+- `/brrr:doctor` diagnostic command — standard in mature CLI tooling (homebrew doctor, flutter doctor); low effort, high trust signal
+- Failed approach registry (debug memory) — current debug cycles "forget" prior attempts; prevents circular optimization
 
-**Defer (v2+):**
-- Multiple data sources beyond the first working one — ship one, expand incrementally
-- Correlation to benchmark — low effort, low priority; add when users ask
-- Paper trading bridge — out of scope; direct users to TradingView PineScript for paper trading
+**Should have (significantly improves the release):**
+- Auto version check (once per 24h, silent on failure) — trivial to implement, prevents stale installs
+- MD-instruction bot-building guide export — bridges the backtest-to-live gap that every competitor ignores
+- Cross-phase metric trajectory — reveals whether debug cycles are converging or stalling
+- Optuna study SQLite persistence for `--resume` support — must be part of initial Bayesian integration, not added later
 
-**Explicit anti-features (never build):**
-- Live trading execution — liability, regulatory risk, scope creep
-- Web UI or dashboard — Claude Code IS the interface
-- Multi-strategy portfolio backtesting — exponentially more complex, different problem
-- Built-in indicator library — maintenance nightmare; Claude writes indicators inline
+**Defer to v2+:**
+- Full multi-objective Optuna (Pareto front) — requires redesigning plan and verify workflows
+- Optuna dashboard web UI — violates the no-server constraint
+- Platform-specific bot-building guide sections (per-exchange code) — high effort, narrow audience per section
+- Automatic strategy generation from Optuna — produces overfitted garbage without human hypothesis guiding it
 
 ### Architecture Approach
 
-The system mirrors the GSD architecture pattern: thin command markdown files (5-15 lines + YAML frontmatter) delegate to fat workflow markdown files (hundreds of lines) via `@` references. STATE.md is the single router — every command reads it first to validate position and refuse out-of-order execution. The Python backtest engine is NOT a fixed library; `references/backtest-engine.md` ships canonical patterns, and Claude composes custom code per strategy at runtime. Phase artifacts are append-only (debug cycles create phase_2, phase_3... not overwrites), preserving full history for AI diagnosis. The Python execution bridge is simple: Claude writes a .py file, runs it via `~/.pmf-venv/bin/python`, reads back JSON + PNG results.
+v1.1 integrates six features into the existing npm package without changing the core command/workflow/references/templates contract. The thin-command-refs-workflow pattern is preserved throughout. See `.planning/research/ARCHITECTURE.md` for full component-level integration maps with file and line references.
 
-**Major components:**
-1. commands/ — thin entry points for Claude Code slash commands (`/brrr:*`)
-2. workflows/ — full behavioral prompts with decision trees and output formats
-3. references/ — read-only knowledge: backtest engine patterns, metrics formulas, data source configs, pitfall catalog
-4. templates/ — scaffolding: STRATEGY.md, STATE.md, report-template.html, pinescript-template.pine
-5. scripts/install.js — copies commands to `~/.claude/commands/brrr/`, creates Python venv at `~/.pmf-venv/`
-6. bin/pmf-tools.cjs — version check, venv helpers
-7. .pmf/ (user project) — per-project state: STRATEGY.md, STATE.md, phases/, context/
-8. output/ (user project) — final deliverables on milestone close: PineScript, reports, clean Python
+**Major components and what changes:**
 
-**Key patterns:**
-- Thin command / fat workflow delegation (mirroring GSD)
-- State-driven command routing via STATE.md
-- Claude-generated Python from reference patterns (not a fixed library)
-- Accumulated phase history (append-only, never overwrite)
+1. `references/backtest_engine.py` — 3-line fix: `run_backtest()` must include `trades` and `equity_curve` keys in its return dict; these keys currently exist in `compute_all_metrics()` inputs but are not passed through to the return value
+2. `references/optuna_bridge.py` (NEW, ~80 lines) — thin wrapper managing Optuna study lifecycle: create/load SQLite study, Ask-and-Tell interface (`study.ask()` / `study.tell()`), parameter suggestion from plan-defined param_space
+3. `workflows/execute.md` — modified for Bayesian code path (Steps 4, 5a, 5f); Step 5e reads `phase_N_debug_memory.md`; equity PNG code uses `results['equity_curve']` directly instead of reconstructing from trades
+4. `workflows/plan.md` — adds `bayesian` as 4th optimization method with auto-selection rule: 3+ free params AND >500 combos
+5. `workflows/verify.md` — appends to `phase_N_debug_memory.md` on debug verdict; adds Step 5a.9 for `bot-building-guide.md` generation on `--approved`
+6. `workflows/discuss.md` — reads `phase_N_debug_memory.md` first in debug mode before reading individual phase artifacts
+7. `commands/doctor.md` + `workflows/doctor.md` (NEW) — new command/workflow pair, read-only health checks
+8. `bin/install.mjs` — writes `.pmf/.version` file for version check
+9. `workflows/status.md` — version check preamble (here and in doctor.md only; not all 8 workflows)
+
+**New runtime artifacts:**
+- `.pmf/phases/phase_N_execute/optuna_study.db` — SQLite Optuna study per phase
+- `.pmf/phases/phase_N_debug_memory.md` — phase-scoped failed approach registry (NOT global)
+- `.pmf/output/bot-building-guide.md` — generated on `--approved`
+- `.pmf/.version` — installed version string for update check
+- `.pmf/.last_version_check` — 24h sentinel file to rate-limit npm registry calls
+
+**Critical architectural constraint:** Debug memory MUST be phase-scoped (`phase_N_debug_memory.md`), not global. A global file leaks strategy-level context across phase boundaries — Phase 3's RSI mean-reversion should not be influenced by Phase 1's SMA crossover failures.
 
 ### Critical Pitfalls
 
-1. **Lookahead bias in Claude-generated backtest code** — use a canonical event-loop pattern in references/ (signal at bar N, execute at bar N+1 open); include a mandatory lookahead audit step in the execute workflow; any Sharpe > 3.0 is a red flag requiring investigation. Recovery cost: HIGH (all results invalid, must re-run from scratch).
+See `.planning/research/PITFALLS.md` for full catalog with recovery strategies and "looks done but isn't" checklist.
 
-2. **Overfitting through excessive parameter optimization** — enforce mandatory train/test split (70/30 default); cap iterations at ~50 per phase; require out-of-sample metrics alongside in-sample; limit free parameters to 5-6 max. Recovery cost: MEDIUM (walk-forward validation can salvage valid strategy concepts).
+1. **Optuna replaces the iteration loop** — if `study.optimize(objective, n_trials=N)` is called directly, all per-iteration infrastructure (equity PNGs, verdict JSONs, AI analysis, `--resume`, stop conditions) is bypassed. Use Ask-and-Tell: `trial = study.ask()` before backtest, `study.tell(trial, value)` after. Highest-severity integration risk; recovery cost is HIGH (rewrite execute workflow Step 5).
 
-3. **Silent wrong financial calculations** — ship a fixed, tested `references/metrics.py` with verified implementations of Sharpe, Sortino, max drawdown, CAGR, profit factor; include known-answer unit tests; Claude imports from this module rather than reimplementing each time. Recovery cost: HIGH (all previous verify reports are misleading, must re-run).
+2. **Debug memory context explosion** — appending full error traces creates 2,200+ lines of context by iteration 20. Cap the memory file at 50 lines using a structured summary table (`| Iter | Params Tried | Result | Why Failed |`), not a verbose append log.
 
-4. **Data quality failures from free sources** — build mandatory data validation before any backtest: check NaN count, gap detection, OHLC sanity, duplicate timestamps; log data quality metrics in the verify report; cache downloaded data locally for reproducibility. Recovery cost: MEDIUM (re-download with validation, re-run on affected date ranges).
+3. **Equity PNG blank due to wrong data source** — `run_backtest()` does not include `trades` or `equity_curve` in its return dict currently; the execute workflow's `results_is.get('trades', [])` always returns `[]`. Fix requires 3 lines in `backtest_engine.py` plus updating the execute workflow template to use `equity_curve` directly.
 
-5. **npm/npx install fails silently or partially** — use explicit `npx print-money-factory install` (not postinstall hook); make install idempotent; validate and report each step clearly; check Python 3.10+ before venv creation; include a `brrr:doctor` diagnostic command; test on macOS Intel/ARM + Ubuntu + WSL. Recovery cost: LOW (re-run install).
+4. **Optuna study lost on `--resume`** — in-memory studies lose the TPE probability model on interruption; resumed optimization restarts the warmup phase, wasting up to 10 previously completed iterations. Use `storage="sqlite:///.pmf/phases/phase_N_execute/optuna_study.db"` from the start.
+
+5. **TPE warmup wastes all iterations** — TPE needs `n_startup_trials` (default 10) random trials before guided sampling begins. With the current default of 10 max iterations, every trial is random. Enforce minimum 20 iterations when Bayesian is selected; display "warmup" vs "guided" mode per iteration so users can see Bayesian is working.
+
+---
 
 ## Implications for Roadmap
 
-Based on combined research, the dependency chain is clear: install must work before anything else, the metrics module and event-loop pattern must be solid before any optimization runs, and the AI iteration loop (the core differentiator) must prove itself before adding advanced features. This suggests 5 phases.
+Based on combined research, the dependency graph and risk profile dictate a 5-phase build order.
 
-### Phase 1: Foundation + Install + Core Engine
+### Phase 1: Equity PNG Bug Fix
 
-**Rationale:** Three critical pitfalls (lookahead bias, wrong metrics, install failures) all require Phase 1 solutions. Nothing else is valid until the metrics are correct and the install works. Architecture research explicitly recommends this build order: package scaffolding → references → install → state management.
-**Delivers:** Working `npx print-money-factory install`, fixed metrics module, canonical event-loop backtest pattern, STATE.md schema, STRATEGY.md schema, `/brrr:new-milestone`, `/brrr:status`, `brrr:doctor`
-**Addresses:** Core metrics suite, commission/slippage modeling, data validation (even minimal), install reliability
-**Avoids:** Lookahead bias (canonical pattern in references/), wrong metric calculations (fixed tested module), silent install failures (validation + doctor command)
-**Needs research:** No — install patterns, Python venv, and npm distribution are well-documented
+**Rationale:** Smallest change surface (3 lines in backtest_engine.py, ~15 lines in execute.md template), zero new files, unblocks the visual feedback mechanism that Bayesian optimization and AI analysis depend on. Fix bugs before adding features.
+**Delivers:** Working equity curve PNGs in every execute iteration with graceful skip when trades are absent.
+**Addresses:** "Fix blank equity PNG" (must-have table stakes) from FEATURES.md.
+**Avoids:** Pitfall 3 (blank PNG from wrong data source). Acceptance criteria: PNG file size >5KB when trades > 0; graceful skip with logged warning when trades = 0.
+**Research flag:** None needed. Root cause confirmed via codebase analysis at line level. Pattern is documented.
 
-### Phase 2: Strategy Discussion + Planning Commands
+### Phase 2: /brrr:doctor + Auto Version Check
 
-**Rationale:** The "thinking" commands (discuss, plan) don't require Python execution and establish the spec that execute depends on. Building them before execute means execute has solid inputs when we get there. Natural language → formal spec is Claude's core strength and requires careful prompt engineering.
-**Delivers:** `/brrr:discuss` (strategy decision gathering, natural language to STRATEGY spec), `/brrr:plan` (parameter space design, optimization method selection, train/test split definition)
-**Addresses:** Out-of-sample split enforcement (plan phase mandates it), position sizing, stop-loss/take-profit, commission assumptions
-**Avoids:** Overfitting through pre-defining parameter budget and split in plan phase before any optimization runs
-**Needs research:** No — prompt engineering for structured output is well-understood; plan workflow design follows GSD patterns
+**Rationale:** Both features are independent and additive (no modifications to existing files for doctor; minimal changes for version check). Adding diagnostic tooling before the more complex Optuna and debug-memory phases gives a safety net for catching integration issues during development. Doctor alone justifies the phase — it surfaces the most common silent failure mode (corrupt or outdated venv).
+**Delivers:** `commands/doctor.md` + `workflows/doctor.md` with 9 health checks (Python version, venv activation, package imports, reference files, template files, workflow files, disk space, milestone status, dep versions vs requirements.txt). Silent version check in `status.md` and `doctor.md` preambles.
+**Addresses:** Diagnostic/maintenance table stakes from FEATURES.md.
+**Avoids:** Pitfall 7 (doctor too shallow — must test actual imports via `python -c "import optuna"`, not just venv directory existence). Pitfall 8 (version check latency — 24h cache via `.pmf/.last_version_check`, silent offline failure, never blocks execution).
+**Research flag:** None needed. Standard CLI diagnostic pattern.
 
-### Phase 3: Execute Phase (AI Backtest Loop)
+### Phase 3: Smarter Debug Cycles (Failed Approach Memory)
 
-**Rationale:** This is the hardest component and the core differentiator. It depends on: working install (Phase 1), solid references/backtest-engine.md (Phase 1), and clear plan output (Phase 2). Building it third gives it the best foundation. The Python execution bridge (write → run → read JSON/PNG) is the key integration to get right.
-**Delivers:** `/brrr:execute` with full AI iteration loop: Claude writes custom backtest.py from plan, runs it, reads metrics.json + equity.png, diagnoses, adjusts parameters, stops on MINT/PLATEAU/REKT; per-iteration artifact files; grid search optimization; data loading from at least one source (start with ccxt or yfinance)
-**Addresses:** AI-driven iteration loop (the differentiator), equity curve + drawdown visualization, trade log, data sourcing
-**Avoids:** Lookahead bias (canonical event-loop reference enforced), overfitting (iteration cap + OOS metrics), data quality failures (validation before each run)
-**Needs research:** YES — data source API integration (ccxt rate limits, yfinance edge cases), Python execution bridge reliability across platforms
+**Rationale:** Improves the core debug loop that already exists in v1.0. Should land before Bayesian optimization because Bayesian iterations may generate more debug cycles, and the memory mechanism needs to be in place to benefit from them. All changes are additive (append/read behavior added to existing workflows).
+**Delivers:** Phase-scoped `phase_N_debug_memory.md` written by verify.md on debug verdict, read by discuss.md first in debug mode. Fixed-size summary table capped at 50 entries. AI analysis in execute.md Step 5e references memory before proposing parameter changes.
+**Addresses:** "Failed approach registry" and "automatic phase budget warning" from FEATURES.md.
+**Avoids:** Pitfall 4 (context explosion — summary table, not verbose log). Pitfall 10 (cross-phase memory leak — phase-scoped files, not a global `DEBUG_MEMORY.md`).
+**Research flag:** None needed. Data structure is settled; changes are additive file operations.
 
-### Phase 4: Verify + Export
+### Phase 4: Bayesian Optimization (Optuna Integration)
 
-**Rationale:** Depends entirely on execute producing real artifacts to verify against. Can't be built without real iteration data to generate reports from. PineScript export is the highest-complexity table-stakes feature and needs its own focus.
-**Delivers:** `/brrr:verify` with plotly HTML report generation (equity curve, drawdown, parameter heatmap, trade log table, cost sensitivity analysis, bias limitations section), `--approved` flow (generates output/ package: PineScript v5, trading-rules.md, performance-report.md, live-checklist.md, backtest_final.py), `--debug` flow (AI post-mortem diagnosis, new phase cycle)
-**Addresses:** HTML report generation, PineScript v5 export, overfitting detection warnings, survivorship bias warnings, regime breakdown (basic)
-**Avoids:** Unrealistic cost modeling (cost sensitivity table in report), hypothesis drift (comparison to original STRATEGY.md)
-**Needs research:** YES — PineScript v5 syntax validation approach (need to define what "valid export" means before shipping)
+**Rationale:** Depends on Phase 1 (equity PNG must work for AI visual analysis to have value), benefits from Phase 2 (doctor diagnoses optuna import issues), benefits from Phase 3 (debug memory reduces circular optimization if Bayesian iterations trigger debug cycles). Highest-complexity phase — modifies the core optimization loop and introduces a new Python module.
+**Delivers:** `references/optuna_bridge.py`, bayesian method in plan.md auto-selection (3+ params OR >500 combos), Ask-and-Tell integration in execute.md Steps 4/5a/5f, SQLite study persistence for `--resume` compatibility, warmup/guided mode display per iteration.
+**Addresses:** "Optuna TPE integration" (must-have) and "Optuna study persistence" (should-have) from FEATURES.md.
+**Avoids:** Pitfall 1 (must use Ask-and-Tell, not `study.optimize()`). Pitfall 2 (enforce min 20 iterations for Bayesian, display warmup/guided mode). Pitfall 5 (SQLite persistence from day one). Pitfall 9 (composite objective function: `sharpe - penalty * max(0, |drawdown| - target)` instead of multi-objective Pareto, which would require redesigning plan and verify workflows).
+**Research flag:** NEEDS deeper planning research. Verify the Ask-and-Tell sequence with SQLite-backed studies on `--resume`. Confirm that `study.ask()` on a loaded study correctly uses the persisted TPE model. Validate optuna_bridge.py constraint handling (fast_period < slow_period) against Optuna 4.8 docs — reporting `float('-inf')` for invalid combos may distort the TPE probability model; Optuna's native constraint API may be preferable. Reference: https://optuna.readthedocs.io/en/stable/tutorial/20_recipes/009_ask_and_tell.html
 
-### Phase 5: Research + Advanced Features + Polish
+### Phase 5: Enhanced Export (Bot-Building Guide)
 
-**Rationale:** Enhancement features that add value but aren't on the critical path. `/brrr:research` is useful but optional (Claude can use WebSearch inline). Bayesian optimization (optuna) can be added after grid search proves the loop. `/brrr:update` is infrastructure polish.
-**Delivers:** `/brrr:research` (WebSearch for strategy implementations and pitfalls), Bayesian optimization via optuna (replaces grid search when plan selects it), walk-forward analysis option, Monte Carlo simulation in verify report, `/brrr:update` (version check + file migration), context file support (.pmf/context/ images/PDFs), hypothesis drift protection
-**Addresses:** Walk-forward analysis (gold standard validation), Bayesian optimization (smarter parameter search), context file understanding (multimodal differentiator)
-**Avoids:** Meta-overfitting through walk-forward (cap windows, document limitations)
-**Needs research:** YES — walk-forward analysis implementation patterns (rolling window design, WFO meta-overfitting); optuna integration with custom backtest loop
+**Rationale:** Purely additive — new Step 5a.9 in verify.md's `--approved` path. Does not block or interact with any other v1.1 feature. Appropriate as the final phase: no dependencies on Phase 1-4 beyond verify.md existing.
+**Delivers:** `bot-building-guide.md` in `.pmf/output/`, platform-detected based on asset class from STRATEGY.md (ccxt for crypto, broker API for stocks, MT5/OANDA for forex). Canonical `strategy_definition.json` as single source of truth to prevent format drift across export files.
+**Addresses:** "MD-instruction bot-building guide" (should-have differentiator) from FEATURES.md.
+**Avoids:** Pitfall 6 (export format drift — canonical `strategy_definition.json` drives all 7 export formats so entry/exit conditions are identical across PineScript, Python, and the new guide). Bot guide generated only on `--approved`, never during debug cycles.
+**Research flag:** None needed. Template-based markdown generation is a Claude-native task. The canonical JSON structure may need one planning iteration to define the schema.
 
 ### Phase Ordering Rationale
 
-- **Foundation first:** All three HIGH-cost pitfalls (lookahead bias, wrong metrics, install failures) must be solved in Phase 1. No results are trustworthy until these are solid.
-- **No execution without specification:** The discuss → plan → execute dependency chain is hard. Skipping straight to execute produces an execute workflow with no clear inputs.
-- **AI loop before export:** There is nothing to export until execute produces approved results. The verify/export phase can only be validated against real iteration data.
-- **Enhancements last:** Bayesian optimization, walk-forward, Monte Carlo are genuinely valuable but none of them are blocking. Grid search + in/out-of-sample split is sufficient for v1 to be useful.
+- **Bug before features:** Phase 1 eliminates broken visual feedback before building features that depend on it (AI equity analysis in Bayesian mode depends on PNGs being non-blank).
+- **Independent tooling before complex integrations:** Phase 2 adds a diagnostic safety net before modifying the core optimization loop in Phase 4. If Phase 4 introduces issues, doctor helps surface them.
+- **Debug loop before Bayesian:** Phase 3 improves the fallback path (debug cycles) before Phase 4 potentially triggers more of them.
+- **Export last:** Phase 5 is purely additive and lowest risk. It is the natural milestone cap.
+- **No new dependencies across all 5 phases:** Eliminates an entire class of integration risk.
 
 ### Research Flags
 
 Phases needing deeper research during planning:
-- **Phase 3 (Execute):** Data source API integration has known edge cases (ccxt rate limits per exchange, yfinance `auto_adjust` parameter changes, Dukascopy chunked downloads). Need concrete tested patterns before building the execute workflow's data loading section.
-- **Phase 4 (Verify/Export):** PineScript v5 syntax validation — determine whether to paste-test manually, use TradingView's API, or rely on Claude's training knowledge plus a comprehensive test suite. This decision affects how confidently the export can be shipped.
-- **Phase 5 (Advanced):** Walk-forward analysis implementation — the rolling window design has subtle choices (anchored vs rolling, how many windows, WFO meta-overfitting risk). QuantInsti and IBKR research exists but implementation patterns need validation.
+- **Phase 4 (Bayesian Optimization):** Verify Ask-and-Tell sequence with SQLite-backed study on `--resume`. Confirm `study.ask()` on a loaded study uses the persisted TPE model. Validate constraint handling approach (invalid param combos). Review Optuna 4.8 Ask-and-Tell recipe before writing optuna_bridge.py.
 
 Phases with standard patterns (skip research-phase):
-- **Phase 1 (Foundation):** Python venv, npm distribution, Node.js file operations — all well-documented, no novel patterns
-- **Phase 2 (Discuss/Plan):** Prompt engineering for structured output follows established GSD patterns; no external APIs involved
-- **Phase 4 (HTML Reports):** plotly `to_html()` with `include_plotlyjs=True` is documented and straightforward
+- **Phase 1 (Equity PNG):** Root cause confirmed at line level. Fix pattern is documented in matplotlib guides.
+- **Phase 2 (Doctor + Version Check):** Standard CLI tooling patterns. Well-documented across multiple ecosystems (homebrew, flutter, npm).
+- **Phase 3 (Debug Memory):** Data structure design is settled. Changes are additive markdown file operations.
+- **Phase 5 (Enhanced Export):** Template generation task with no novel integration points.
+
+---
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All libraries verified on PyPI with current versions as of 2026-03-21; kaleido Chrome dep confirmed from official plotly docs; polygon rebrand confirmed from GitHub |
-| Features | HIGH | Backtesting metrics and table stakes verified against multiple independent trading education sources; competitive landscape researched directly |
-| Architecture | HIGH | Direct inspection of GSD package architecture; Claude Code slash command system inspected directly; well-established npm/venv patterns |
-| Pitfalls | HIGH | Backtesting pitfalls extensively documented in academic and practitioner sources; Claude Code CLI pitfalls verified against current docs; LLM code hallucination research cited |
+| Stack | HIGH | Zero new dependencies confirmed. All existing packages verified against current stable versions (Optuna 4.8.0, matplotlib 3.10.8, plotly 6.5.2). No version bumps needed. requirements.txt and package.json require only a version bump. |
+| Features | HIGH | Priority order backed by multiple sources (Optuna docs, trading tool patterns, codebase analysis). Must-have vs should-have vs defer boundaries are clear. |
+| Architecture | HIGH | Integration maps derived from direct codebase analysis: execute.md (1067 lines), backtest_engine.py (241 lines), metrics.py, verify.md, discuss.md. Root cause of equity PNG bug confirmed at line level (metrics.py return dict does not include raw trades or equity_curve). |
+| Pitfalls | HIGH | Critical pitfalls verified via official Optuna docs (Ask-and-Tell recipe), matplotlib blank PNG documentation, and direct codebase analysis. Recovery strategies are concrete, not theoretical. |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **PineScript v5 syntax validation strategy:** Research didn't resolve whether Claude-generated PineScript can be validated programmatically before delivery, or whether it requires paste-testing in TradingView. This decision affects Phase 4 scope. Recommendation: start with Claude generating PineScript from a validated skeleton template and treat v1 as "best effort with known limitations." Add syntax errors encountered during testing to references/.
+- **Composite objective function penalty weight:** PITFALLS.md recommends `sharpe - 2*drawdown_penalty` but flags the constant "2" as arbitrary. During Phase 4 planning, decide whether to make the penalty weight user-configurable via the plan artifact or hardcode it with an explicit "tune this" comment.
 
-- **ccxt exchange compatibility matrix:** ccxt covers 100+ exchanges but historical data availability varies wildly. The execute workflow needs to handle "exchange X doesn't support timeframe Y" gracefully. Recommendation: ship with a tested default exchange (Binance for crypto) and add exchange-specific handling incrementally.
+- **optuna_bridge.py constraint handling:** Trading parameters often have constraints (fast_period < slow_period). The current design returns `float('-inf')` for invalid combos. Verify this is compatible with TPE's internal model — many negative-infinity objectives may distort the probability model. Optuna's native constraint API (`study.tell(trial, values, constraint_values)`) may be preferable. Validate before implementation.
 
-- **Claude Code skills vs commands directory evolution:** PITFALLS.md notes that Claude Code may migrate from `~/.claude/commands/` to `~/.claude/skills/`. The install and update commands must handle both paths. This is a moving target — monitor Claude Code release notes during development.
+- **Doctor `--fix` flag scope:** Research agrees doctor should be diagnose-only in v1.1, with `--fix` deferred. If scope pressure forces a choice, drop `--fix` entirely — auto-repairing venvs risks breaking the user's setup worse than the original problem.
 
-- **State corruption recovery:** If STATE.md gets corrupted mid-optimization, the current design has no hard recovery path beyond `/brrr:status` attempting a rebuild from phase artifacts. This edge case should be designed into the status workflow explicitly.
+- **Version check placement:** Architecture research recommends adding the version check preamble only to `status.md` and `doctor.md` (not all 8 workflows) to reduce maintenance burden. This is the right call but should be made explicit in the Phase 2 plan to prevent the temptation to add it everywhere.
+
+- **strategy_definition.json schema:** Phase 5 introduces a canonical JSON as single source of truth for all export formats. The schema needs to be defined before templating any of the 7 export formats in the bot-building guide. A one-iteration planning step to define required fields (entry conditions, exit conditions, parameters, indicator definitions, position sizing rules) will prevent rework.
+
+---
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- GSD (`~/.claude/get-shit-done/`) — direct inspection of command/workflow/template/reference pattern
-- Claude Code slash command system — direct inspection of `~/.claude/commands/gsd/` for frontmatter and `@` reference patterns
-- [pandas 3.0 release notes](https://pandas.pydata.org/docs/whatsnew/v3.0.0.html) — version requirements
-- [Plotly static image generation changes](https://plotly.com/python/static-image-generation-changes/) — kaleido v1 Chrome requirement confirmed
-- [polygon-api-client PyPI](https://pypi.org/project/polygon-api-client/) / [GitHub rebrand](https://github.com/polygon-io/client-python) — legacy package name decision
-- [optuna GitHub](https://github.com/optuna/optuna) — v4.7.0, sampler options
-- [Python venv docs](https://docs.python.org/3/library/venv.html) — stdlib venv patterns
+- [Optuna 4.8 TPESampler docs](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html) — TPE multivariate mode, n_startup_trials defaults, constructor options
+- [Optuna Ask-and-Tell recipe](https://optuna.readthedocs.io/en/stable/tutorial/20_recipes/009_ask_and_tell.html) — ask/tell API for external loop integration, the pattern that makes Bayesian mode work without replacing the iteration loop
+- [Matplotlib savefig blank image causes](https://pythonguides.com/matplotlib-savefig-blank-image/) — 5 documented causes of blank PNGs with fixes
+- [npm view documentation](https://docs.npmjs.com/cli/v7/commands/npm-view/) — version lookup via CLI, rate limits
+- Codebase: `workflows/execute.md` (1067 lines), `references/backtest_engine.py` (241 lines), `references/metrics.py` — direct line-level analysis confirming root cause of equity PNG bug
 
 ### Secondary (MEDIUM confidence)
-- [Interactive Brokers: Walk Forward Analysis](https://www.interactivebrokers.com/campus/ibkr-quant-news/the-future-of-backtesting-a-deep-dive-into-walk-forward-analysis/) — WFA as gold standard
-- [LuxAlgo: Backtesting Traps](https://www.luxalgo.com/blog/backtesting-traps-common-errors-to-avoid/) — pitfall catalog
-- [QuantInsti: Walk-Forward Optimization](https://blog.quantinsti.com/walk-forward-optimization-introduction/) — implementation methodology
-- [Claude Code Docs: Slash Commands / Skills](https://code.claude.com/docs/en/slash-commands) — current skills system
-- [npm Security Best Practices](https://github.com/lirantal/npm-security-best-practices) — postinstall risks
-- [FX Replay: 5 KPIs That Matter Most](https://www.fxreplay.com/learn/the-5-kpis-that-matter-most-in-backtesting-a-strategy) — metrics baseline
+- [Piotr Pomorski — Hyperparameter optimization with backtesting](https://piotrpomorski.substack.com/p/hyperparameter-optimisation-with) — Optuna + trading strategy integration pattern
+- [3Commas Backtesting Guide 2025](https://3commas.io/blog/comprehensive-2025-guide-to-backtesting-ai-trading) — optimization workflow patterns
+- [Optuna Efficient Optimization Algorithms](https://optuna.readthedocs.io/en/stable/tutorial/10_key_features/003_efficient_optimization_algorithms.html) — TPE sampler details, pruning, n_startup_trials behavior
+- [Optuna Multi-objective Optimization](https://optuna.readthedocs.io/en/stable/tutorial/20_recipes/002_multi_objective.html) — rationale for deferring Pareto front
 
-### Tertiary (LOW confidence / needs validation during implementation)
-- [arxiv 2311.15548: LLM Deficiency in Finance](https://arxiv.org/abs/2311.15548) — LLM hallucination in financial tasks (informs pitfall severity but not implementation)
-- yfinance `auto_adjust` behavior — documented in multiple community sources but behavior has changed between versions; validate during Phase 3 implementation
-- dukascopy-python reliability — limited documentation; validate during Phase 3 data integration
+### Tertiary (LOW confidence)
+- [Walk-forward optimization for trading strategies](https://eveince.substack.com/p/walk-forward-optimization-for-algorithmic) — WFO as user override (not default)
+- [The Probability of Backtest Overfitting](https://www.davidhbailey.com/dhbpapers/backtest-prob.pdf) — academic reference on overfitting risk in composite objectives
 
 ---
-*Research completed: 2026-03-21*
+*Research completed: 2026-03-22*
 *Ready for roadmap: yes*

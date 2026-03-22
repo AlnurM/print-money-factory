@@ -1,156 +1,153 @@
 # Feature Landscape
 
 **Domain:** AI-assisted trading strategy development CLI (backtest-to-export pipeline)
-**Researched:** 2026-03-21
+**Researched:** 2026-03-22
+**Milestone:** v1.1 Enhancement Features
 
 ## Table Stakes
 
-Features users expect. Missing = product feels incomplete.
+Features users expect in a v1.1 of a tool that already has a working pipeline. These are polish items that feel like oversights if missing.
 
-### Backtest Engine
+### Bayesian Optimization (Optuna Integration)
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Core metrics suite (net P&L, win rate, profit factor, max drawdown, Sharpe ratio, Sortino ratio) | Every backtest tool reports these. Traders evaluate strategies on these numbers. Missing any = tool feels amateur. | Low | Compute from trade log. Sharpe/Sortino need daily returns series. |
-| Equity curve visualization | Traders need to see account growth over time. The single most-looked-at chart. | Low | Per-iteration PNG during execute, interactive plotly in final report. Already in PROJECT.md. |
-| Drawdown chart | Traders obsess over drawdown. Seeing peak-to-trough decline visually is non-negotiable. | Low | Plot alongside equity curve. Show max drawdown line. |
-| Trade log with per-trade details | Traders audit individual trades: entry/exit time, price, size, P&L, holding period. Without this, results are a black box. | Low | DataFrame output from backtest engine. Include in HTML report as sortable table. |
-| Commission and slippage modeling | Ignoring transaction costs produces fantasy results. Traders know this and distrust tools that skip it. | Low | Configurable per-trade commission (flat or %) and slippage (fixed or % of spread). Set during discuss phase. |
-| Multiple timeframes of historical data | Strategies need sufficient data. At minimum: daily bars for stocks/crypto/forex. | Med | ccxt (crypto), yfinance (stocks/forex daily). Already planned. Key: handle gaps, timezone alignment. |
-| Position sizing | Fixed lot, percentage of equity, and volatility-based (ATR) sizing are baseline expectations. | Low | Discussed in discuss phase, implemented in backtest code. |
-| Stop-loss and take-profit | Every serious strategy has risk management. Entry-only strategies are toys. | Low | Fixed, trailing, ATR-based stops. Set during discuss phase. |
-| Parameter optimization (grid search) | Traders expect to sweep parameter ranges and find best combinations. Grid search is the default everyone understands. | Med | Iterate parameter combos, track results, find best by target metric. |
-| Out-of-sample / in-sample split | Testing on the same data you optimize on is the #1 beginner mistake. Tools must enforce train/test splits. | Low | Split data by date. Report both in-sample and out-of-sample metrics separately. |
-| Overfitting detection warnings | Profit factor > 3.0, Sharpe > 3.0, or vastly different in-sample vs out-of-sample results = red flags. Tool should call these out. | Low | Heuristic checks on final metrics. AI analysis already planned for execute phase. |
+| Feature | Why Expected | Complexity | Depends On |
+|---------|--------------|------------|------------|
+| Optuna TPE sampler as optimization method | Grid/random search already exist. Any tool with 5+ parameters needs smarter search. Users who saw optuna in the dependency list expect it to work. TPE is the default Optuna sampler and the right choice -- it outperforms random search after ~20 trials and handles conditional parameter spaces natively. | Med | Existing execute.md iteration loop, plan.md method selection |
+| `suggest_*` API for parameter proposals | Optuna's `trial.suggest_int()`, `trial.suggest_float()`, `trial.suggest_categorical()` replace manual parameter selection in execute Step 5f. The AI currently hand-picks next parameters; Optuna should propose them instead, with AI retaining veto/override power. | Med | Optuna study object persisted across iterations |
+| Optuna study persistence (SQLite) | Studies must survive session interruptions. Optuna natively supports `optuna.create_study(storage="sqlite:///.pmf/phases/phase_N_execute/optuna_study.db")`. This enables `--resume` to work with Bayesian state, not just iteration artifacts. | Low | `--resume` flag in execute.md |
+| Pruning unpromising trials | Optuna's `MedianPruner` (for random) or `HyperbandPruner` (for TPE) can stop bad parameter combos early. For backtesting: report intermediate Sharpe at 25%, 50%, 75% of data. If Sharpe at 50% is terrible, prune. Saves significant execution time on large parameter spaces. | Med | Optuna study, backtest engine reporting intermediate values |
+| Multi-objective optimization support | Traders always optimize for multiple conflicting goals: high Sharpe AND low drawdown AND sufficient trades. Optuna supports multi-objective natively via `create_study(directions=["maximize", "minimize", "maximize"])`. Pareto-optimal solutions replace single-metric ranking. | High | Plan.md changes to define multiple objectives, verify.md to display Pareto front |
+| Warm-starting from prior phases | When debug cycle opens Phase N+1, the Optuna study from Phase N should seed the new study. Optuna supports `enqueue_trial()` to inject known good parameters. This carries forward optimization knowledge across debug cycles. | Low | Debug cycle flow in verify.md |
 
-### Workflow / CLI
+### Diagnostic / Maintenance Commands
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Clear phase progression (idea to results) | Users need to know where they are and what's next. Confusion = abandonment. | Low | STATUS command with ASCII tree. Already planned. |
-| Persistent state between sessions | Strategy development spans days/weeks. Losing progress = dealbreaker. | Low | STATE.md and STRATEGY.md files. Already planned. |
-| HTML report generation | Traders share results, review them outside terminal. Standalone HTML with embedded charts is the standard. | Med | Plotly-based. Already planned. Single file, no server needed. |
-| Export to usable trading code | Backtest results without executable code are academic exercises. PineScript is the dominant retail format. | High | PineScript v5 generation is the hardest table-stakes feature. Must produce valid, runnable code. |
-| Data source flexibility | Different asset classes need different data sources. Being locked to one = limited audience. | Med | Already planned: ccxt, yfinance, Dukascopy, polygon.io, CSV fallback. |
-| Error recovery / resume | Backtest runs fail (API limits, bad data, Python errors). Users need to pick up where they left off, not restart. | Med | STATE.md tracks iteration progress. Execute phase should resume from last good iteration. |
+| Feature | Why Expected | Complexity | Depends On |
+|---------|--------------|------------|------------|
+| `/brrr:doctor` -- environment health check | Users hit install issues silently (wrong Python version, missing deps, broken venv). A doctor command is standard practice in CLI tools (homebrew doctor, npm doctor, flutter doctor). Should check: Python version >= 3.10, venv exists and activates, all pip deps importable, disk space, data source connectivity. | Low | Existing install script, requirements.txt |
+| Auto version check (silent, once per session) | npm packages update frequently. Users running stale commands miss fixes. Check `npm view @print-money-factory/cli version` once per session, compare to installed, show one-line notice if outdated. Never block execution. | Low | npm registry, package.json version |
+| Dependency version reporting in doctor | Show exact versions of critical deps (pandas, optuna, plotly, ccxt, yfinance) vs expected versions. Version mismatches cause subtle bugs (pandas 2.x vs 3.x column behavior). | Low | requirements.txt, pip list |
+| Data source connectivity test | Doctor should attempt a tiny data fetch from each configured source (1 bar of BTC/USDT from ccxt, 1 day of SPY from yfinance) to verify API access. Report pass/fail per source. | Low | data_sources.py adapters |
+
+### Debug Cycle Memory (Smarter Debug Cycles)
+
+| Feature | Why Expected | Complexity | Depends On |
+|---------|--------------|------------|------------|
+| Failed approach registry | Current debug cycles carry forward via `debug_diagnosis.md`, but the discuss workflow only reads the LAST phase's diagnosis. It should read ALL prior diagnoses and maintain a structured "tried and failed" list. This prevents the AI from re-suggesting approaches that already failed. | Med | verify.md debug path, discuss.md debug-discuss mode |
+| Cross-phase metric trajectory | Show a metric progression chart across ALL phases (not just within one phase's iterations). Phase 1 best Sharpe: 0.7, Phase 2: 1.1, Phase 3: 1.4 -- this trajectory reveals whether debug cycles are converging or stalling. | Low | STATE.md best metrics per phase |
+| Automatic phase budget warning | If the milestone has gone through 3+ debug cycles without meeting targets, warn the user that the hypothesis may be fundamentally flawed. Suggest a new milestone with a different approach. Currently drift detection exists, but cycle count exhaustion does not. | Low | STATE.md phase count |
+| Structured parameter changelog | Track which parameters changed between phases (not just between iterations). Phase 1 used EMA 10/50; Phase 2 added ADX filter; Phase 3 switched to SMA. This log helps the AI and user understand the strategy's evolution. | Low | phase_N_discuss.md files, plan artifacts |
+
+### Equity PNG Bug Fix
+
+| Feature | Why Expected | Complexity | Depends On |
+|---------|--------------|------------|------------|
+| Fix blank equity curve PNGs during execute | Currently broken. matplotlib renders blank graphs during `/brrr:execute` iterations. This is a critical bug -- visual iteration feedback is the primary way users track optimization progress. Most likely cause: matplotlib figure not receiving data before `savefig()`, or the equity curve array is empty/wrong type. | Low | execute.md Step 5d, matplotlib Agg backend |
 
 ## Differentiators
 
-Features that set product apart. Not expected, but valued.
+Features that would make v1.1 notably better than v1.0, beyond expected polish.
 
-### AI-Driven (Unique to This Tool)
+### Enhanced Export
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| AI-analyzed iteration loop | No other tool has AI look at backtest results, diagnose problems, adjust parameters, and re-run automatically. This is the core differentiator. Composer/Nvestiq do natural-language input but NOT iterative AI-driven optimization. | High | The execute phase loop: run backtest, AI reads metrics + equity curve, decides next parameter adjustment or stop condition. This is what makes PMF unique. |
-| Natural language strategy input | Describe "fade failed breakouts at resistance" and the system understands. Competitors like Composer and Nvestiq offer this, but PMF does it through Claude Code which is more powerful for complex strategies. | Med | discuss phase converts natural language to formal strategy spec in STRATEGY.md. Claude's strength. |
-| AI diagnosis on debug cycles | When verify produces --debug, AI reads the full report, identifies WHY the strategy underperformed, and suggests specific fixes. No competitor does post-mortem diagnosis. | Med | verify --debug triggers new phase cycle with AI diagnosis carried forward. Already planned. |
-| Hypothesis drift protection | Detects when iterative tweaking has drifted so far from the original idea that it's a different strategy. Suggests opening a new milestone instead. | Low | Compare current parameters/logic to original STRATEGY.md. Already planned. |
-| Context file understanding (images, PDFs) | Upload a chart screenshot or research paper, and the system incorporates it into strategy design. Unique to Claude Code's multimodal capabilities. | Med | .pmf/context/ directory. Already planned. Leverages Claude's vision. |
+| Feature | Value Proposition | Complexity | Depends On |
+|---------|-------------------|------------|------------|
+| MD-instruction bot-building guide | A new export file (`bot-building-guide.md`) that gives step-by-step instructions for implementing the strategy as a live trading bot. Covers: which platform/broker to use for the asset class, API setup, position sizing for real account size, risk management rules, monitoring checklist, and common gotchas. This bridges the gap between "backtest approved" and "actually trading." No competitor exports this. | Med | Existing export flow in verify.md Step 5a, strategy artifacts |
+| Platform-specific implementation sections | The bot-building guide should have sections for the 2-3 most relevant platforms per asset class: crypto (ccxt + exchange API), stocks (Alpaca/IBKR API), forex (MT4/MT5 EA). Each section: "How to implement THIS strategy on THIS platform." | High | Asset class detection from STRATEGY.md |
+| Claude Code prompt for bot building | Export a `.md` file that IS a Claude Code prompt -- the user can paste it into a new Claude Code session and say "build this bot" and it contains all the context needed. Strategy logic, parameters, risk rules, platform preferences. This is uniquely powerful because the tool runs IN Claude Code. | Med | All strategy artifacts, best_result.json |
 
-### Advanced Backtest Features
+### Advanced Optimization Features
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Walk-forward analysis | The "gold standard" for strategy validation per industry consensus. Splits data into rolling in-sample/out-of-sample windows. Most retail tools skip this. | High | Computationally expensive. Plan phase should offer this as an optimization method. Worth implementing but flag as advanced. |
-| Parameter heatmap visualization | 2D color grid showing how performance varies across two parameters. Immediately reveals whether a strategy is robust (broad plateau) or fragile (narrow spike). | Med | Already planned for HTML report. Use plotly heatmap. |
-| Regime breakdown analysis | Show performance split by market regime (trending, ranging, volatile). Traders need to know WHEN their strategy works, not just IF. | Med | Classify periods by volatility or trend strength. Report metrics per regime. Already mentioned in PROJECT.md. |
-| Bayesian optimization | Smarter than grid search for large parameter spaces. Finds good parameters in fewer iterations. | High | Optuna is already in the planned dependency list. Use TPE sampler. |
-| Monte Carlo simulation | Randomize trade order to show range of possible equity curves. Reveals how much of the result is path-dependent luck. | Med | Shuffle trade returns, generate N equity curves, show confidence bands. Powerful for risk assessment. |
-| Correlation to benchmark | Show strategy returns vs buy-and-hold or market index. Traders need to know if they're beating passive. | Low | Compute alpha, beta, correlation coefficient. Display on report. |
-
-### Export / Delivery
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Trading rules document (plain English) | Machine-readable rules are great, but traders also need human-readable rules for discipline. | Low | Already planned (trading-rules.md). Claude generates from STRATEGY.md. |
-| Live trading checklist | Step-by-step guide: which broker, what settings, position size for account X, what to monitor. Bridges the gap from backtest to live. | Low | Already planned (live-checklist.md). Template-driven. |
-| Python backtest as reproducible artifact | Final backtest script that anyone can re-run to verify results. Transparency builds trust. | Low | Already planned (backtest_final.py). |
-| Performance report (markdown) | Portable summary for sharing in forums, Discord, journals. | Low | Already planned (performance-report.md). |
+| Feature | Value Proposition | Complexity | Depends On |
+|---------|-------------------|------------|------------|
+| Optuna visualization integration | Optuna has built-in visualization (`optuna.visualization.plot_optimization_history`, `plot_param_importances`, `plot_pareto_front`). Embed these in the HTML report alongside existing plotly charts. Shows which parameters matter most and how optimization progressed. | Med | Optuna study persistence, report_generator.py |
+| CMA-ES sampler for continuous parameters | When all parameters are continuous (floats), CMA-ES outperforms TPE. Optuna supports it via `CmaEsSampler`. Auto-select based on parameter types in plan.md. | Low | Optuna, plan.md parameter type detection |
+| Constrained optimization | Optuna supports constraints (e.g., "maximize Sharpe subject to drawdown < 15%"). Currently the execute loop checks constraints post-hoc. With Optuna constraints, bad regions are avoided entirely. | Med | Optuna study, plan.md constraint definitions |
 
 ## Anti-Features
 
-Features to explicitly NOT build.
+Features to explicitly NOT build in v1.1.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| Live trading execution | Massive liability, regulatory risk, scope creep. Live trading is a fundamentally different problem (connectivity, order management, risk controls, latency). Mixing it with backtesting produces bad backtesting AND bad live trading. | Export PineScript/Python. User connects to their own broker. Live trading is explicitly out of scope per PROJECT.md. |
-| Real-time data streaming | Adds infrastructure complexity (websockets, rate limits, reconnection). Not needed for backtesting. | Use historical data downloads. Cache locally. |
-| Web UI or dashboard | Splits development effort. Claude Code IS the interface. Building a web UI means maintaining two interfaces that drift apart. | Terminal-only via slash commands. HTML reports are read-only output, not interactive UI. |
-| Multi-strategy portfolio backtesting | Exponentially more complex: correlation, capital allocation, rebalancing. Solving a different problem than single-strategy development. | One strategy per milestone. Portfolio construction is a separate tool. |
-| Built-in indicator library | Maintaining 200+ indicators is a maintenance nightmare. Claude can implement any indicator on-the-fly from its training data. | Claude writes indicator calculations inline in the backtest code. Describe what you need, Claude codes it fresh. |
-| Paper trading simulation | Different from backtesting (requires live data feed, order simulation, clock sync). Half-measure between backtest and live. | Export to TradingView for paper trading via PineScript. |
-| User accounts / cloud storage | This is a local tool. Adding auth and cloud storage violates the zero-infrastructure principle. | Everything is local files. Git handles versioning. |
-| Genetic/evolutionary strategy generation | StrategyQuant / Build Alpha territory. Generates thousands of random strategies and picks winners. Produces overfitted garbage without deep domain knowledge guiding it. | AI-guided iteration from a human hypothesis. The human + AI loop is the right approach. |
-| Intraday tick-level simulation | Tick data is enormous, slow to process, and rarely available for free. Bar-level simulation is sufficient for 95% of retail strategies. | OHLCV bars at various timeframes. Minute bars are the finest practical resolution. |
+| Full Optuna dashboard (web UI) | Optuna has a dashboard (`optuna-dashboard`) but it requires a running server. Violates the "no server" constraint. Would split attention from the CLI experience. | Embed Optuna visualizations as static plots in the HTML report. |
+| Automatic strategy generation from Optuna | Using Optuna to generate strategy LOGIC (not just parameters) crosses into StrategyQuant territory. Produces overfitted garbage without human hypothesis guiding it. | Optuna optimizes parameters within a human-defined strategy. The human + AI hypothesis loop is the differentiator. |
+| Real-time monitoring of live bots | The bot-building guide exports instructions, not a monitoring system. Building monitoring is scope creep into ops tooling. | Export checklist of what to monitor. User sets up monitoring on their platform. |
+| Multi-strategy Optuna optimization | Optimizing a portfolio of strategies simultaneously is a different problem requiring correlation analysis, capital allocation, and rebalancing logic. | One strategy per milestone. Portfolio construction is a separate tool. |
+| Custom Optuna samplers | OptunaHub has exotic samplers (VaR, GP-based). These add complexity without clear value for typical trading parameter spaces where TPE and CMA-ES cover 99% of use cases. | Stick to TPE (default), CMA-ES (continuous params), and random (baseline). |
+| Dependency auto-repair in doctor | Doctor should DIAGNOSE, not FIX. Auto-repairing venvs or reinstalling deps risks breaking the user's setup worse. | Doctor reports what's wrong. User runs `/brrr:update` to fix. |
 
 ## Feature Dependencies
 
 ```
-Commission/slippage modeling --> Accurate metrics (all metrics depend on realistic cost modeling)
-Data sourcing (ccxt/yfinance) --> Backtest execution (can't run without data)
-Core metrics suite --> Equity curve + drawdown chart (computed from same data)
-Core metrics suite --> Overfitting detection (heuristics on metric values)
-Parameter optimization --> Parameter heatmap (heatmap is a visualization of optimization results)
-In-sample/out-of-sample split --> Walk-forward analysis (WFA generalizes the split concept)
-discuss phase (strategy spec) --> execute phase (backtest needs formal rules)
-execute phase (backtest loop) --> verify phase (needs results to report on)
-verify phase (report) --> export (needs approved strategy to export)
-AI iteration loop --> Hypothesis drift protection (needs baseline + current to compare)
-Bayesian optimization --> optuna dependency (already planned)
-Regime breakdown --> Market regime classifier (volatility/trend detection)
+Optuna study creation --> Optuna TPE sampler (study required for any sampler)
+Optuna study creation --> Optuna pruning (pruner attaches to study)
+Optuna study creation --> Optuna persistence (SQLite storage)
+Optuna study persistence --> Warm-starting from prior phases (need saved study to seed from)
+Optuna study persistence --> --resume with Bayesian state
+Optuna study creation --> Multi-objective optimization
+Optuna study persistence --> Optuna visualization in report
+
+Plan.md method selection --> Optuna integration (plan must offer "bayesian" as optimization method)
+Execute.md iteration loop --> Optuna parameter suggestion (replaces manual Step 5f)
+
+Failed approach registry --> Smarter discuss debug-discuss mode
+Cross-phase metric trajectory --> STATUS command enhancement
+Automatic phase budget warning --> STATE.md phase count tracking (already exists)
+
+Existing export flow (verify Step 5a) --> MD-instruction bot-building guide (new export file)
+STRATEGY.md asset class --> Platform-specific sections in guide
+
+Equity PNG bug fix --> (standalone, no dependencies, should be done first)
+Doctor command --> (standalone, no dependencies on other v1.1 features)
+Auto version check --> (standalone, npm registry access only)
 ```
 
-## MVP Recommendation
+## Priority Recommendation
 
-Prioritize (Phase 1 - must ship for the tool to be usable):
+### Must-have for v1.1 (ship or it's not worth a release):
 
-1. **Core metrics suite** - Net P&L, win rate, profit factor, max drawdown, Sharpe, Sortino, expectancy, trade count
-2. **Commission and slippage modeling** - Without this, all metrics are lies
-3. **Equity curve + drawdown visualization** - Per-iteration PNG, plotly in final report
-4. **Trade log** - Per-trade details in report
-5. **In-sample / out-of-sample split** - Enforced by default
-6. **Grid search optimization** - Simple, understandable parameter sweeping
-7. **AI iteration loop** - THE differentiator. If this works well, the tool has a reason to exist
-8. **HTML report generation** - Traders need a deliverable to review
-9. **PineScript v5 export** - Bridge from backtest to live trading
-10. **Single data source working** (ccxt for crypto OR yfinance for stocks) - Expand later
+1. **Fix equity PNG bug** -- broken feature in v1.0, users see blank charts, zero dependencies, fix first
+2. **Optuna TPE integration in execute loop** -- the headline feature. Replace manual AI parameter selection with Optuna suggestions + AI oversight. Study persistence via SQLite for resume support.
+3. **`/brrr:doctor` diagnostic command** -- low effort, high user trust. Environment health check catches the silent failures that cause bad support experiences.
+4. **Failed approach registry** -- the current debug cycle "forgets" too easily. A structured list of what was tried and why it failed prevents circular optimization.
 
-Defer to Phase 2:
-- Walk-forward analysis: Valuable but complex. Grid search + in/out-of-sample is sufficient for v1.
-- Bayesian optimization: Optuna integration after grid search proves the loop works.
-- Monte Carlo simulation: Nice-to-have for risk assessment, not blocking.
-- Regime breakdown: Requires market classifier. Add after core reporting works.
-- Multiple data sources: Ship with one working source, add others incrementally.
-- Parameter heatmap: Needs optimization data structure. Add after optimization is solid.
-- Context file support (images/PDFs): Powerful but not blocking the core loop.
+### Should-have for v1.1 (significantly improves the release):
 
-Defer indefinitely:
-- Correlation to benchmark: Low effort but low priority. Add when someone asks.
+5. **Auto version check** -- trivial to implement, prevents stale installs
+6. **MD-instruction bot-building guide export** -- the most valuable new export. Bridges backtest-to-live gap that every competitor ignores.
+7. **Cross-phase metric trajectory** -- simple visualization that reveals whether debug cycles are converging
+8. **Warm-starting Optuna from prior phases** -- makes debug cycles smarter without user effort
 
-## Competitive Landscape Context
+### Nice-to-have (defer if scope pressure):
 
-| Competitor | Strengths | What PMF Does Better |
-|------------|-----------|---------------------|
-| TradingView Strategy Tester | Huge user base, built-in charting, PineScript ecosystem | PMF: AI-driven iteration, not manual tweak-and-retest cycles |
-| QuantConnect | Multi-asset, cloud backtesting, institutional grade | PMF: Zero infrastructure, natural language input, no learning curve for quant libraries |
-| Composer | Natural language strategy input, no-code | PMF: Deeper iteration loop, debug diagnosis, Claude handles complex strategies Composer can't express |
-| Nvestiq | Natural language, one-click deployment | PMF: Full control over backtest code, export artifacts, transparent methodology |
-| backtesting.py | Clean Python API, parameter optimization, heatmaps | PMF: AI writes the code, no Python knowledge needed from user |
-| Build Alpha / StrategyQuant | Automated strategy generation, massive search | PMF: Human hypothesis + AI refinement vs. brute-force search. Better strategies, less overfitting. |
+9. **Optuna pruning** -- saves time on large parameter spaces but not critical for initial integration
+10. **Multi-objective optimization** -- powerful but adds complexity to plan and verify workflows
+11. **Optuna visualization in HTML report** -- enhancement to existing report, not blocking
+12. **Platform-specific bot-building sections** -- high effort, narrow audience per section
+13. **Claude Code prompt export** -- clever but low urgency
+
+## Complexity Budget
+
+| Feature Group | Estimated Effort | Files Modified |
+|---------------|-----------------|----------------|
+| Equity PNG fix | 1-2 hours | execute.md (Step 5d), possibly backtest_engine.py |
+| Optuna core integration | 1-2 days | plan.md, execute.md (Steps 4, 5f), new optuna_optimizer.py |
+| Doctor command | 0.5 day | new command doctor.md, new workflow doctor.md |
+| Auto version check | 2-3 hours | All command preambles or shared preamble include |
+| Debug cycle memory | 0.5-1 day | verify.md (Step 5b), discuss.md (Step 2-debug), STATE.md schema |
+| Bot-building guide export | 0.5-1 day | verify.md (Step 5a, new sub-step), new template |
+| Optuna advanced (pruning, multi-obj, viz) | 1-2 days | execute.md, report_generator.py, verify.md |
+
+**Total estimated: 4-7 days of development**
 
 ## Sources
 
-- [FX Replay - 5 KPIs That Matter Most](https://www.fxreplay.com/learn/the-5-kpis-that-matter-most-in-backtesting-a-strategy) - Metrics baseline
-- [TrendSpider - Basic Backtesting Metrics](https://trendspider.com/learning-center/basic-backtesting-metrics/) - Table stakes metrics
-- [TrendSpider - Advanced Backtesting Metrics](https://trendspider.com/learning-center/advanced-backtesting-metrics/) - Advanced metrics
-- [LuxAlgo - Top 7 Metrics](https://www.luxalgo.com/blog/top-7-metrics-for-backtesting-results/) - Metric priorities
-- [Algo Strategy Analyzer - Advanced Trading Metrics 2026](https://algostrategyanalyzer.com/en/blog/advanced-trading-metrics/) - Sharpe, Sortino, Calmar, SQN
-- [LuxAlgo - Backtesting Traps](https://www.luxalgo.com/blog/backtesting-traps-common-errors-to-avoid/) - Overfitting, lookahead bias
-- [Interactive Brokers - Walk Forward Analysis](https://www.interactivebrokers.com/campus/ibkr-quant-news/the-future-of-backtesting-a-deep-dive-into-walk-forward-analysis/) - WFA as gold standard
-- [backtesting.py - Parameter Heatmap](https://kernc.github.io/backtesting.py/doc/examples/Parameter%20Heatmap%20&%20Optimization.html) - Heatmap visualization patterns
-- [QuantConnect - Backtest Analysis](https://www.quantconnect.com/docs/v2/research-environment/meta-analysis/backtest-analysis) - Report structure
-- [Composer](https://www.composer.trade/) - Natural language strategy competitor
-- [Capitalise.ai](https://capitalise.ai/) - Code-free automation competitor
-- [newtrading.io - Backtesting Software 2026](https://www.newtrading.io/backtesting-software/) - Market overview
-- [AnalystPrep - Problems in Backtesting](https://analystprep.com/study-notes/cfa-level-2/problems-in-backtesting/) - Academic pitfalls reference
+- [Optuna TPESampler docs](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html) - TPE sampler API and defaults
+- [Optuna efficient optimization](https://optuna.readthedocs.io/en/stable/tutorial/10_key_features/003_efficient_optimization_algorithms.html) - Pruning and sampler selection
+- [OptunaHub samplers](https://hub.optuna.org/samplers/) - Available samplers including CMA-ES
+- [Optuna GitHub releases](https://github.com/optuna/optuna/releases) - v4.7.0+ features
+- [Traderize - Debug Bot Best Practices](https://blog.traderize.com/posts/debug_bot/) - Diagnostic logging, health checks
+- [3Commas - Backtesting Guide 2025](https://3commas.io/blog/comprehensive-2025-guide-to-backtesting-ai-trading) - Optimization workflow patterns
+- [Petr Vojacek - Trading Bot Risks](https://petrvojacek.cz/en/blog/trading-bot-risks-and-tools/) - Overfitting detection, ongoing maintenance
+- [Piotr Pomorski - Hyperparameter optimization with backtesting](https://piotrpomorski.substack.com/p/hyperparameter-optimisation-with) - Optuna + trading strategy integration pattern
+- [LuxAlgo - Building Your First Trading Bot](https://www.luxalgo.com/blog/building-your-first-trading-bot-step-by-step-guide/) - Bot deployment best practices
