@@ -140,6 +140,18 @@ Parse rules:
 4. If `--resume` is present, set resume_mode=true
 5. Store parsed flags for use throughout the workflow
 
+### Bayesian Resume Logic
+
+When `resume_mode=true` AND the plan's `optimization_method` is `bayesian`:
+
+1. Check if `{output_dir}/optuna_study.db` exists
+   - If YES: This is a Bayesian resume. The study will be loaded in Step 4.
+   - If NO: Treat as fresh start (no prior Bayesian iterations to resume from)
+
+2. The standard `--resume` logic (scanning for `iter_NN_verdict.json`) STILL runs to determine the `start_iteration` number. The SQLite study is loaded separately for the probability model.
+
+3. Per D-14: When `optimization_method` is NOT `bayesian`, the `--resume` flag works exactly as before (verdict JSON scan only). No SQLite loading.
+
 ---
 
 ## Step 1: Load Inputs
@@ -180,7 +192,13 @@ Gather all the information needed to run the optimization loop.
    - Rule 3: No future data in indicator calculations
    - Claude MUST follow these rules when writing `calculate_signal()`
 
-6. Display a summary of what was loaded:
+6. If `optimization_method` is `bayesian`:
+   - Read `sampler` field from plan (default: `auto`)
+   - Read `min_iterations` from plan (default: 20)
+   - If `max_iterations < min_iterations`, warn: "Bayesian optimization needs at least {min_iterations} iterations (10 warmup + 10 guided). With {max_iterations} iterations, random search would be equally effective. Continuing with {max_iterations} iterations."
+   - Set `dd_target` from the plan's evaluation criteria (max_drawdown target, e.g., 0.15 for 15%)
+
+7. Display a summary of what was loaded:
 
 ```
 --- Inputs Loaded ---
