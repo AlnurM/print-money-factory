@@ -4,6 +4,36 @@ Create a new trading strategy milestone through guided conversation.
 
 Follow these sections in order, top to bottom. Each section contains behavioral instructions -- read them, then execute them using your tools (Read, Write, Bash, Glob). Do NOT skip sections unless explicitly told to.
 
+---
+
+## Preamble: Version Check
+
+**This check is silent and best-effort. It MUST NOT block or delay the workflow.**
+
+1. Check if the version check was done recently:
+   Run via Bash: `find ~/.pmf/.last_version_check -mtime -1 2>/dev/null`
+   - If the command outputs the filename, the check was done within the last 24 hours -- SKIP the rest of this preamble and proceed to the next section.
+   - If the command outputs nothing (file missing or older than 24h), continue.
+
+2. Read `~/.pmf/.version` to get the current installed version:
+   - Use the Read tool to read `~/.pmf/.version` and parse the JSON to extract the `version` field.
+   - If the file does not exist, SKIP the rest of this preamble silently.
+
+3. Check npm for the latest version:
+   Run via Bash: `npm view @print-money-factory/cli version 2>/dev/null`
+   - If the command fails (network error, package not found), SKIP silently -- no error, no notice.
+
+4. Compare versions:
+   - If the npm version differs from the installed version, display exactly:
+     `Update available: v{current} -> v{latest}. Run /brrr:update`
+   - If versions match, display nothing.
+
+5. Update the timestamp file:
+   Run via Bash: `touch ~/.pmf/.last_version_check`
+   This gates the check to once per 24 hours.
+
+---
+
 ## CRITICAL: Interaction Rules
 
 **ONE question at a time.** This is a conversation, not a form.
