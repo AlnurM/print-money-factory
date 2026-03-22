@@ -86,7 +86,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 09-01-PLAN.md -- Create optuna_bridge.py module with TDD (study lifecycle, sampler selection, Ask-and-Tell, scoring, resume)
+- [x] 09-01-PLAN.md -- Create optuna_bridge.py module with TDD (study lifecycle, sampler selection, Ask-and-Tell, scoring, resume)
 - [x] 09-02-PLAN.md -- Add bayesian method to plan.md Step 4 (auto-selection, override, artifact fields)
 - [ ] 09-03-PLAN.md -- Add bayesian branch to execute.md (Ask-and-Tell loop, resume, warmup/guided display)
 
@@ -118,7 +118,7 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 6. Equity PNG Bug Fix | v1.1 | 0/1 | Planning | - |
 | 7. Maintenance Tooling | v1.1 | 0/2 | Planning | - |
 | 8. Debug Cycle Memory | v1.1 | 1/2 | In Progress|  |
-| 9. Bayesian Optimization | v1.1 | 0/3 | Planning | - |
+| 9. Bayesian Optimization | v1.1 | 2/3 | In Progress|  |
 | 10. Enhanced Export | v1.1 | 0/? | Not started | - |
 
 ---
