@@ -59,7 +59,7 @@ Current position:
     {step_icon} execute    {status}
     {step_icon} verify     {status}
 
-Next step: `/brrr:discuss`
+Next step: /brrr:discuss
 ```
 
 5. If discuss IS done, proceed to the next section
@@ -565,7 +565,7 @@ Method: {optimization method}
 Parameters: {X} to optimize ({Y} combinations), {Z} fixed
 Split: {train}% train / {test}% test
 
-Next step: `/brrr:execute`
+Next step: /brrr:execute
 ```
 
 ---

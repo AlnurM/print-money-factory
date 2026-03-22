@@ -46,7 +46,7 @@ Before anything else, verify that execute has been completed for the current pha
 
 No milestone exists. Create one first to define your strategy scope and targets.
 
-Next step: `/brrr:new-milestone`
+Next step: /brrr:new-milestone
 ```
 
 3. If it exists, read it and find:
@@ -1092,13 +1092,13 @@ removing the sideways-regime losses."}
 
 Rules for diagnosis:
 - Be SPECIFIC. Use numbers, dates, metric values. Not "results were poor."
-- The hypothesis must be actionable -- the next `/brrr:discuss` session should be able to implement it directly.
+- The hypothesis must be actionable -- the next /brrr:discuss session should be able to implement it directly.
 - Reference the data: "Based on the regime table, sideways trades had a 30% win rate vs 65% in bull."
 - If the strategy is fundamentally flawed, say so: "Consider switching to a mean-reversion approach instead."
 
 ### 5b.2: Write Diagnosis JSON (DBUG-01)
 
-After writing the human-readable diagnosis, write a machine-readable `phase_N_diagnosis.json` that captures failed approaches and explicit "do NOT retry" entries. This structured artifact is consumed by `/brrr:discuss` in debug mode to prevent retrying failed parameter regions.
+After writing the human-readable diagnosis, write a machine-readable `phase_N_diagnosis.json` that captures failed approaches and explicit "do NOT retry" entries. This structured artifact is consumed by /brrr:discuss in debug mode to prevent retrying failed parameter regions.
 
 1. **Check for existing diagnosis file**: Use the Read tool to check if `.pmf/phases/phase_N_diagnosis.json` exists (where N is the current phase number).
    - If it exists, parse the JSON and extract the existing `failed_approaches` array.

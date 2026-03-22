@@ -46,7 +46,7 @@ Before anything else, verify that plan has been completed for the current phase.
 
 No milestone exists. Create one first to define your strategy scope and targets.
 
-Next step: `/brrr:new-milestone`
+Next step: /brrr:new-milestone
 ```
 
 3. If it exists, read it and find:
@@ -79,7 +79,7 @@ Current position:
     {step_icon} Execute    {status}
     {step_icon} Verify     {status}
 
-Next step: `/brrr:plan`
+Next step: /brrr:plan
 ```
 
 6. If Execute is already checked for Phase N, STOP:
@@ -98,7 +98,7 @@ Current position:
     [DONE] Execute
     {step_icon} Verify     {status}
 
-Next step: `/brrr:verify`
+Next step: /brrr:verify
 ```
 
 7. If Plan IS done and Execute is NOT done, proceed to the next section.
@@ -1120,7 +1120,7 @@ Iterations:      {total}
 Best Sharpe:     {is_value} (IS) / {oos_value} (OOS)
 Best Max DD:     {is_value}% (IS) / {oos_value}% (OOS)
 
-Next step: `/brrr:verify`
+Next step: /brrr:verify
 ```
 
 ---

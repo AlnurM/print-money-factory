@@ -353,14 +353,14 @@ Files created:
   .pmf/STRATEGY.md -- strategy definition and scope
   .pmf/STATE.md    -- milestone state tracker
 
-Next step: `/brrr:discuss`
+Next step: /brrr:discuss
 ```
 
 ---
 
 ## Sequence Validation (Reference for all commands)
 
-This table documents the validation rules that ALL `/brrr:*` workflows should check before executing. It is included here as the canonical reference since new-milestone establishes the state that other commands depend on.
+This table documents the validation rules that ALL /brrr:* workflows should check before executing. It is included here as the canonical reference since new-milestone establishes the state that other commands depend on.
 
 ### Validation Matrix
 
@@ -391,7 +391,7 @@ Current position:
     {step_icon} execute    {status}
     {step_icon} verify     {status}
 
-Next step: `/brrr:{next_command}`
+Next step: /brrr:{next_command}
 ```
 
 ### Prerequisite Explanations

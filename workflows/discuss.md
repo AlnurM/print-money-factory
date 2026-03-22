@@ -80,7 +80,7 @@ Before anything else, verify the discuss step is valid for the current phase.
 
 No milestone exists. Create one first to define your strategy scope and targets.
 
-Next step: `/brrr:new-milestone`
+Next step: /brrr:new-milestone
 ```
 
 3. If the file exists, read it and extract:
@@ -113,7 +113,7 @@ Current position:
     {step_icon} execute    {status}
     {step_icon} verify     {status}
 
-Next step: `/brrr:{next_command}`
+Next step: /brrr:{next_command}
 ```
 
 6. As a file existence fallback, verify `.pmf/STRATEGY.md` exists. If it does not exist, STOP:
@@ -125,7 +125,7 @@ The discuss phase fixes all strategy decisions -- entry/exit logic, indicators, 
 
 STRATEGY.md is created by /brrr:new-milestone and is required for discuss.
 
-Next step: `/brrr:new-milestone`
+Next step: /brrr:new-milestone
 ```
 
 7. If all checks pass, proceed to the next section
@@ -462,7 +462,7 @@ Cannot continue until you choose.
 
    e. Do NOT allow "continue anyway" -- the user MUST pick option 1 or option 2
    f. If option 1: revert the drift changes and proceed to Step 3 with the remaining non-drift changes
-   g. If option 2: STOP the workflow entirely. Tell the user to run `/brrr:new-milestone` for the new approach
+   g. If option 2: STOP the workflow entirely. Tell the user to run /brrr:new-milestone for the new approach
 
 ---
 
@@ -614,7 +614,7 @@ Artifact: .pmf/phases/phase_{N}_discuss.md
 Decisions fixed: 7 (entry, exit, stop-loss, take-profit, sizing, commissions, parameters)
 Parameters: {X} to optimize, {Y} fixed
 
-Next step: `/brrr:research` (optional) or `/brrr:plan`
+Next step: /brrr:research (optional) or /brrr:plan
 ```
 
 ---
