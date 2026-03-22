@@ -7,7 +7,7 @@
 
 ### Bug Fixes
 
-- [ ] **BFIX-01**: Equity PNG shows actual equity curve data during `/brrr:execute` iterations (not blank)
+- [x] **BFIX-01**: Equity PNG shows actual equity curve data during `/brrr:execute` iterations (not blank)
 
 ### Optimization
 
@@ -59,7 +59,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BFIX-01 | Phase 6 | Pending |
+| BFIX-01 | Phase 6 | Complete |
 | OPT-01 | Phase 9 | Pending |
 | OPT-02 | Phase 9 | Pending |
 | OPT-03 | Phase 9 | Pending |

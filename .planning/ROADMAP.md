@@ -41,7 +41,7 @@
 **Plans**: 1 plan
 
 Plans:
-- [ ] 06-01-PLAN.md -- Return trades/equity_curve from run_backtest() and fix execute.md PNG generation
+- [x] 06-01-PLAN.md -- Return trades/equity_curve from run_backtest() and fix execute.md PNG generation
 
 ### Phase 7: Maintenance Tooling
 **Goal**: Users can diagnose installation health and know when updates are available
