@@ -528,29 +528,24 @@ if not {fast_mode}:
     matplotlib.use('Agg')  # MUST be before pyplot import
     import matplotlib.pyplot as plt
 
-    # Reconstruct equity curve from IS trades
-    # (run_backtest returns compute_all_metrics output which does not include raw equity)
-    trades_is = results_is.get('trades', [])
+    # Use equity_curve returned directly from run_backtest()
+    trade_count = results_is.get('trade_count', 0)
     initial_capital = params.get('initial_capital', 10000)
-    if trades_is:
-        pnls = [t['pnl'] for t in trades_is]
-        equity = [initial_capital]
-        for pnl in pnls:
-            equity.append(equity[-1] + pnl)
-        equity_arr = np.array(equity)
+    if trade_count == 0:
+        print("WARNING: No trades generated -- equity PNG skipped")
     else:
-        equity_arr = np.array([initial_capital])
+        equity_arr = results_is.get('equity_curve', np.array([initial_capital]))
 
-    fig, ax = plt.subplots(figsize=(12, 6))
-    ax.plot(equity_arr, linewidth=1, color='#2196F3')
-    ax.set_title(f'Equity Curve - Iteration {N:02d} (IS)')
-    ax.set_ylabel('Equity ($)')
-    ax.set_xlabel('Trade #')
-    ax.axhline(y=initial_capital, color='gray', linestyle='--', alpha=0.5)
-    ax.grid(True, alpha=0.3)
-    fig.savefig('{output_dir}/iter_{N:02d}_equity.png', dpi=100, bbox_inches='tight')
-    plt.close(fig)  # Critical: prevent memory leak
-    plt.close('all')  # Safety net
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.plot(equity_arr, linewidth=1, color='#2196F3')
+        ax.set_title(f'Equity Curve - Iteration {N:02d} (IS)')
+        ax.set_ylabel('Equity ($)')
+        ax.set_xlabel('Bar')
+        ax.axhline(y=initial_capital, color='gray', linestyle='--', alpha=0.5)
+        ax.grid(True, alpha=0.3)
+        fig.savefig('{output_dir}/iter_{N:02d}_equity.png', dpi=100, bbox_inches='tight')
+        plt.close(fig)  # Critical: prevent memory leak
+        plt.close('all')  # Safety net
 ```
 
 9. **Print results summary and SUCCESS sentinel:**
