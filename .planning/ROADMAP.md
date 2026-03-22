@@ -98,10 +98,10 @@ Plans:
   1. Running `/brrr:verify --approved` generates a `bot-building-guide.md` alongside the existing export files
   2. The guide contains platform-specific instructions detected from the strategy's asset class (crypto exchanges for crypto, broker APIs for stocks, MT5/OANDA for forex)
   3. The guide is only generated on `--approved`, never during `--debug` cycles
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 10-01: TBD
+- [ ] 10-01-PLAN.md -- Add bot-building-guide.md generation step to verify.md export pipeline
 
 ## Progress
 
@@ -119,7 +119,7 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 7. Maintenance Tooling | v1.1 | 0/2 | Planning | - |
 | 8. Debug Cycle Memory | v1.1 | 1/2 | In Progress|  |
 | 9. Bayesian Optimization | v1.1 | 2/3 | In Progress|  |
-| 10. Enhanced Export | v1.1 | 0/? | Not started | - |
+| 10. Enhanced Export | v1.1 | 0/1 | Planning | - |
 
 ---
 *Roadmap created: 2026-03-22*
