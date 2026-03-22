@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 2: Milestone Lifecycle & State** - Milestone creation, state tracking, status display, context file support
 - [ ] **Phase 3: Strategy Specification** - Discuss, research, and plan commands that produce a formal backtest spec
 - [x] **Phase 4: AI Backtest Loop** - Execute command with data sourcing, Claude-written backtest engine, and iterative optimization (completed 2026-03-21)
-- [ ] **Phase 5: Verify & Export** - Interactive HTML report generation, approval flow, debug cycles, and export package
+- [x] **Phase 5: Verify & Export** - Interactive HTML report generation, approval flow, debug cycles, and export package (completed 2026-03-22)
 
 ## Phase Details
 
@@ -97,12 +97,12 @@ Plans:
   3. User runs `/brrr:verify --approved` and gets an `output/` directory containing valid PineScript v5, trading-rules.md, performance-report.md, backtest_final.py, live-checklist.md, and the HTML report
   4. User runs `/brrr:verify --debug` and the system diagnoses what went wrong, opens a new phase cycle, and the next `/brrr:discuss` starts from the AI diagnosis rather than from scratch
   5. The PineScript export is a valid TradingView strategy that can be pasted directly into the Pine Editor
-**Plans:** 1/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [x] 05-01-PLAN.md -- HTML report template extension + Python report generator (all 9 sections, regime/benchmark analytics)
 - [x] 05-02-PLAN.md -- Verify workflow + PineScript syntax reference (AI analysis, approval/debug flow, export package)
-- [ ] 05-03-PLAN.md -- Install script update + end-to-end human verification
+- [x] 05-03-PLAN.md -- Install script update + end-to-end human verification
 
 ## Progress
 
@@ -115,4 +115,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Milestone Lifecycle & State | 2/2 | Complete | - |
 | 3. Strategy Specification | 3/3 | Complete | - |
 | 4. AI Backtest Loop | 2/2 | Complete   | 2026-03-21 |
-| 5. Verify & Export | 1/3 | In Progress|  |
+| 5. Verify & Export | 3/3 | Complete   | 2026-03-22 |
