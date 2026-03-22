@@ -417,6 +417,40 @@ Current parameters:
   ...
 ```
 
+### Bayesian Optimization Setup (when optimization_method is bayesian)
+
+Before the iteration loop begins, set up the Optuna study:
+
+1. **Import optuna_bridge:** The backtest script must have access to `~/.pmf/references/optuna_bridge.py`. Add `sys.path.insert(0, os.path.expanduser("~/.pmf/references"))` at the top of the generated Python script.
+
+2. **Build distributions:** Call `build_distributions(param_space)` where `param_space` is the list of parameter dicts from the plan artifact.
+
+3. **Select sampler:** Call `select_sampler(param_space)` which returns `(sampler, sampler_name)`. Per D-09, this auto-selects CMA-ES for all-continuous-float params, TPE otherwise. Per D-10, this happens at execute time, not plan time.
+
+4. **Handle resume (per D-12):**
+   - If `resume_mode=true` AND `optuna_study.db` exists:
+     - If `sampler_name == "CMA-ES"`: Try `load_sampler(output_dir)` to restore pickled sampler state. If found, use it instead of fresh sampler.
+     - Load study: `get_or_create_study(study_name, output_dir, sampler)` with `load_if_exists=True`
+     - Check for param space changes (per D-13): `changes = detect_param_changes(study, distributions)`. If changes found, display warning:
+       ```
+       ⚠ Parameter space changed since last run:
+         {change descriptions}
+       Options: continue with existing study (may produce suboptimal suggestions) or start fresh study (loses prior learning)
+       Continue with existing study? (yes / fresh)
+       ```
+       If user chooses "fresh": delete `optuna_study.db` and `optuna_sampler.pkl`, create new study.
+   - If NOT resume: `get_or_create_study(study_name, output_dir, sampler)` creates fresh study.
+
+5. **Display setup:**
+   ```
+   --- Bayesian Optimization ---
+   Sampler: {sampler_name} (auto-selected)
+   Reason: {if CMA-ES: "All parameters are continuous floats" / if TPE: "Mixed parameter types detected (int/categorical/float with step)"}
+   Warmup trials: 10 (random sampling before Bayesian guidance kicks in)
+   Study: {output_dir}/optuna_study.db
+   {If resume: "Loaded {N} prior trials from existing study"}
+   ```
+
 ---
 
 ## Step 5: Iteration Loop
@@ -830,6 +864,50 @@ Based on the analysis, decide what to change for the next iteration.
 - **Random search:** Sample random combinations from the parameter space, guided by AI analysis of which directions are promising.
 - **Walk-forward / AI-guided:** Claude decides which parameters to change based on the metrics and analysis. This is the default behavior when the plan selects walk_forward or when the AI override is most effective.
 
+- **Bayesian (Optuna Ask-and-Tell per D-01):** Parameters are suggested by Optuna, not by Claude.
+
+  ```python
+  # Get next parameter suggestion from Optuna
+  trial, suggested_params = suggest_params(study, distributions)
+  warmup = is_warmup(study)
+  mode_tag = "[WARMUP]" if warmup else "[GUIDED]"
+  ```
+
+  Use `suggested_params` as the parameter values for the next backtest iteration. Claude does NOT override Optuna's suggestions -- the model's value comes from its probability-guided search.
+
+  **After the backtest completes and metrics are available:**
+
+  ```python
+  # Compute composite score and report to Optuna (per D-04)
+  score = compute_composite_score(metrics, dd_target)
+  report_result(study, trial, score)
+
+  # Save CMA-ES sampler state for resume capability
+  if sampler_name == "CMA-ES":
+      save_sampler(study, output_dir)
+  ```
+
+  **Display iteration with mode tag (per D-03):**
+
+  ```
+  Iteration {N}/{max_iterations} {mode_tag} ({sampler_name})
+    Parameters: {suggested_params}
+    Composite score: {score}
+    {If [GUIDED]: "Optuna is now using learned probability model to suggest promising regions"}
+  ```
+
+  **Verdict JSON addition for bayesian:** Add these fields to the standard verdict JSON:
+  ```json
+  {
+    "optuna_trial_number": "{trial.number}",
+    "optuna_mode": "{WARMUP or GUIDED}",
+    "composite_score": "{score}",
+    "sampler": "{sampler_name}"
+  }
+  ```
+
+  **AI analysis still runs per D-02:** After each iteration, Claude still reads the metrics and equity PNG, writes its analysis of what happened and why. The only difference from non-bayesian is that Claude does NOT decide the next parameters -- Optuna does. Claude's analysis is for the user's understanding, not for parameter selection.
+
 **For each parameter change, explain the reasoning (per D-03):**
 
 ```
@@ -990,6 +1068,19 @@ Result saved: .pmf/phases/phase_N_best_result.json
 - **NO DATA:** "Data issues prevented the backtest from running. See above for details."
 
 - **MAX_ITERATIONS:** "Reached maximum iterations ({N}). The best result was at iteration {K}. You can continue with `--resume --iterations {higher_N}` to run more iterations."
+
+**Bayesian summary (when optimization_method is bayesian):**
+
+After the standard final summary, also display:
+
+```
+--- Bayesian Optimization Complete ---
+Best trial: #{study.best_trial.number}
+Best score: {study.best_value}
+Best params: {study.best_params}
+Total trials: {len(study.trials)} ({warmup_count} warmup + {guided_count} guided)
+Study saved: {output_dir}/optuna_study.db
+```
 
 ---
 
