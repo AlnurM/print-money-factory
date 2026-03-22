@@ -183,11 +183,14 @@ def run_backtest(df: pd.DataFrame, params: dict) -> dict:
         })
         equity[-1] = current_equity + net_pnl
 
-    return compute_all_metrics(
+    metrics = compute_all_metrics(
         trades=trades,
         equity_curve=np.array(equity),
         trading_days=trading_days,
     )
+    metrics['trades'] = trades
+    metrics['equity_curve'] = np.array(equity)
+    return metrics
 
 
 def save_iteration_artifacts(results: dict, params: dict, iteration: int, output_dir: str):
