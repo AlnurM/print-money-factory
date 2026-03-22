@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Enhancement
 status: unknown
-stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-03-22T18:55:01.969Z"
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-03-22T19:22:54.274Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 8
+  completed_plans: 6
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** The iterative backtest loop must work end-to-end: idea -> backtest -> AI analysis -> adjustment -> repeat until targets hit or strategy diagnosed unviable.
-**Current focus:** Phase 08 — debug-cycle-memory
+**Current focus:** Phase 09 — bayesian-optimization
 
 ## Current Position
 
-Phase: 9
-Plan: Not started
+Phase: 09 (bayesian-optimization) — EXECUTING
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 07]: Version check preamble uses find -mtime -1 for 24h gate and npm view for latest version
 - [Phase 08]: Diagnosis JSON step placed as 5b.2 between markdown diagnosis and STATE.md update for natural analysis flow
 - [Phase 08]: Diagnosis file references use phase_*_diagnosis.json glob pattern for milestone-scoped reads
+- [Phase 09]: Auto-selection threshold: >500 combinations triggers bayesian, walk-forward kept as override only
 
 ### Pending Todos
 
@@ -57,6 +58,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-22T18:52:26.900Z
-Stopped at: Completed 08-02-PLAN.md
+Last session: 2026-03-22T19:22:54.271Z
+Stopped at: Completed 09-02-PLAN.md
 Resume file: None

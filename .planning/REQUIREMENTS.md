@@ -14,7 +14,7 @@
 - [ ] **OPT-01**: `/brrr:execute` uses Optuna TPE sampler for Bayesian parameter optimization via Ask-and-Tell API
 - [ ] **OPT-02**: Optuna auto-selects CMA-ES sampler when all parameters are continuous, TPE otherwise
 - [ ] **OPT-03**: Optuna study persists to SQLite so `--resume` preserves the Bayesian probability model
-- [ ] **OPT-04**: `/brrr:plan` includes Bayesian as an optimization method option alongside grid/random/walk-forward
+- [x] **OPT-04**: `/brrr:plan` includes Bayesian as an optimization method option alongside grid/random/walk-forward
 
 ### Debug Cycles
 
@@ -63,7 +63,7 @@
 | OPT-01 | Phase 9 | Pending |
 | OPT-02 | Phase 9 | Pending |
 | OPT-03 | Phase 9 | Pending |
-| OPT-04 | Phase 9 | Pending |
+| OPT-04 | Phase 9 | Complete |
 | DBUG-01 | Phase 8 | Complete |
 | DBUG-02 | Phase 8 | Complete |
 | DBUG-03 | Phase 8 | Complete |
