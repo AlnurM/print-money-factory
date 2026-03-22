@@ -71,7 +71,7 @@ Plans:
 
 Plans:
 - [x] 08-01-PLAN.md -- Add diagnosis JSON write to verify --debug workflow path
-- [ ] 08-02-PLAN.md -- Add debug memory reading and failure table to discuss workflow
+- [x] 08-02-PLAN.md -- Add debug memory reading and failure table to discuss workflow
 
 ### Phase 9: Bayesian Optimization
 **Goal**: Users can run Optuna-powered Bayesian parameter optimization that outperforms random/grid search on large parameter spaces

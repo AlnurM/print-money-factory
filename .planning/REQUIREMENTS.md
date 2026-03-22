@@ -19,8 +19,8 @@
 ### Debug Cycles
 
 - [x] **DBUG-01**: `/brrr:verify --debug` writes a structured diagnosis JSON with failed approaches, parameter regions, and explicit "do NOT retry" entries
-- [ ] **DBUG-02**: `/brrr:discuss` in debug mode reads all prior diagnosis artifacts and presents them as context before gathering new decisions
-- [ ] **DBUG-03**: Debug memory is phase-scoped and size-capped (max 50 entries) to prevent context explosion
+- [x] **DBUG-02**: `/brrr:discuss` in debug mode reads all prior diagnosis artifacts and presents them as context before gathering new decisions
+- [x] **DBUG-03**: Debug memory is phase-scoped and size-capped (max 50 entries) to prevent context explosion
 
 ### Maintenance
 
@@ -65,8 +65,8 @@
 | OPT-03 | Phase 9 | Pending |
 | OPT-04 | Phase 9 | Pending |
 | DBUG-01 | Phase 8 | Complete |
-| DBUG-02 | Phase 8 | Pending |
-| DBUG-03 | Phase 8 | Pending |
+| DBUG-02 | Phase 8 | Complete |
+| DBUG-03 | Phase 8 | Complete |
 | MANT-01 | Phase 7 | Complete |
 | MANT-02 | Phase 7 | Complete |
 | EXPT-08 | Phase 10 | Pending |

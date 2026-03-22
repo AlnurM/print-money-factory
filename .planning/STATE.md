@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Enhancement
 status: unknown
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-03-22T18:48:47.950Z"
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-03-22T18:52:26.902Z"
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -44,6 +44,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 07]: Used single Python script for batch import checks in doctor workflow
 - [Phase 07]: Version check preamble uses find -mtime -1 for 24h gate and npm view for latest version
 - [Phase 08]: Diagnosis JSON step placed as 5b.2 between markdown diagnosis and STATE.md update for natural analysis flow
+- [Phase 08]: Diagnosis file references use phase_*_diagnosis.json glob pattern for milestone-scoped reads
 
 ### Pending Todos
 
@@ -56,6 +57,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-22T18:48:47.947Z
-Stopped at: Completed 08-01-PLAN.md
+Last session: 2026-03-22T18:52:26.900Z
+Stopped at: Completed 08-02-PLAN.md
 Resume file: None
