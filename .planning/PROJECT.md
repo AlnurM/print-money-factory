@@ -33,7 +33,23 @@ The iterative backtest loop must work end-to-end: a user describes a strategy id
 
 ### Active
 
-(None — next milestone requirements TBD via `/gsd:new-milestone`)
+- [ ] Bayesian optimization via optuna for large parameter spaces
+- [ ] Enhanced export: MD-instruction format for bot-building guides
+- [ ] `/brrr:doctor` diagnostic command — checks Python version, venv health, dependencies
+- [ ] Auto version check on every `/brrr:*` command (silent, once per session)
+- [ ] Smarter debug cycles — AI carries forward failed approaches across iterations
+- [ ] Fix blank equity PNG generation during `/brrr:execute`
+
+## Current Milestone: v1.1 Enhancement
+
+**Goal:** Polish the existing pipeline with smarter optimization, better debug cycles, maintenance tooling, and bug fixes.
+
+**Target features:**
+- Advanced optimization (Bayesian/optuna)
+- Enhanced export (MD-instruction format)
+- Maintenance commands (/brrr:doctor, auto version check)
+- Smarter debug cycles
+- Fix equity PNG bug
 
 ### Out of Scope
 
@@ -95,4 +111,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-22 after v1.0 milestone completion*
+*Last updated: 2026-03-22 after v1.1 milestone started*
