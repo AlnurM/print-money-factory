@@ -55,7 +55,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 07-01-PLAN.md -- Create /brrr:doctor diagnostic command and workflow
+- [x] 07-01-PLAN.md -- Create /brrr:doctor diagnostic command and workflow
 - [ ] 07-02-PLAN.md -- Add version check preamble to all workflows
 
 ### Phase 8: Debug Cycle Memory

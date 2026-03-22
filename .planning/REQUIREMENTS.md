@@ -24,7 +24,7 @@
 
 ### Maintenance
 
-- [ ] **MANT-01**: `/brrr:doctor` checks Python version, venv existence, dependency imports, command file integrity, and reports pass/fail per check
+- [x] **MANT-01**: `/brrr:doctor` checks Python version, venv existence, dependency imports, command file integrity, and reports pass/fail per check
 - [ ] **MANT-02**: Every `/brrr:*` command silently checks for new npm version (once per session via timestamp file) and displays update notice if available
 
 ### Export
@@ -67,7 +67,7 @@
 | DBUG-01 | Phase 8 | Pending |
 | DBUG-02 | Phase 8 | Pending |
 | DBUG-03 | Phase 8 | Pending |
-| MANT-01 | Phase 7 | Pending |
+| MANT-01 | Phase 7 | Complete |
 | MANT-02 | Phase 7 | Pending |
 | EXPT-08 | Phase 10 | Pending |
 
